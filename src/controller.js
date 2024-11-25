@@ -1,8 +1,8 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const { v4: uuidv4 } = require('uuid');
-const db = require('./connect'); 
-const { SECRET_KEY } = require('./config');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const { v4: uuidv4 } = require("uuid");
+const db = require("./connect");
+const { SECRET_KEY } = require("./config");
 
 // Register API
 const register = async (req, res) => {
@@ -14,14 +14,10 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    db.query(
-      "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-      [name, email, hashedPassword],
-      (err, result) => {
-        if (err) return res.status(500).json({ message: "Database error", error: err });
-        res.status(201).json({ message: "User registered successfully" });
-      }
-    );
+    db.query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", [name, email, hashedPassword], (err, result) => {
+      if (err) return res.status(500).json({ message: "Database error", error: err });
+      res.status(201).json({ message: "User registered successfully" });
+    });
   });
 };
 
@@ -47,14 +43,10 @@ const Transaction = (req, res) => {
   const { category_id, user_id, amount, date, description } = req.body;
 
   const transaction_id = uuidv4();
-  db.query(
-    'INSERT INTO transaction (transaction_id, category_id, user_id, amount, date, description) VALUES (?, ?, ?, ?, ?, ?)',
-    [transaction_id, category_id, user_id, amount, date, description],
-    (err, result) => {
-      if (err) return res.status(500).json({ message: 'Database error', error: err });
-      res.status(201).json({ message: 'Transaction added successfully', transaction_id });
-    }
-  );
+  db.query("INSERT INTO transaction (transaction_id, category_id, user_id, amount, date, description) VALUES (?, ?, ?, ?, ?, ?)", [transaction_id, category_id, user_id, amount, date, description], (err, result) => {
+    if (err) return res.status(500).json({ message: "Database error", error: err });
+    res.status(201).json({ message: "Transaction added successfully", transaction_id });
+  });
 };
 
 module.exports = { register, login, Transaction };
