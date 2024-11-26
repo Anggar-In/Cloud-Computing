@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const mysql = require('mysql2/promise');
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = require('./config');
 
@@ -41,4 +40,3 @@ db.connect((err) => {
 });
 
 module.exports = db;
->>>>>>> f186631f2b34b20dafb1ea9ceee0cc95dc1e2931
