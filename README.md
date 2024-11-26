@@ -13,3 +13,11 @@ Sebelum memulai, pastikan telah menginstal :
 3. npm install express jwt-simple bcryptjs body-parser mysql2
 4. npm install dotenv
 5. npm install uuid
+6. npm install tesseract.js
+7. npm install multer
+
+## Routes To Test API
+1. POST http://localhost:3000/api/auth/register
+2. POST http://localhost:3000/api/auth/login
+3. POST http://localhost:3000/api/transaction
+4. POST http://localhost:3000/api/upload-receipt
