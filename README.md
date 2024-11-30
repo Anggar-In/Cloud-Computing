@@ -18,6 +18,7 @@ Sebelum memulai, pastikan telah menginstal :
 
 ## Routes To Test API
 
+### POST
 1. POST http://localhost:3000/api/auth/register
 2. POST http://localhost:3000/api/auth/login
 3. POST http://localhost:3000/api/transaction
@@ -26,12 +27,14 @@ Sebelum memulai, pastikan telah menginstal :
 6. POST http://localhost:3000/api/auth/logout
 7. POST http://localhost:3000/api/expense
 
+### GET
 1. GET http://localhost:3000/api/budgets/:user_id
 2. GET http://localhost:3000/api/expenses/:user_id
 
+### PUT
 1. PUT http://localhost:3000/api/budget/:budget_id
 2. PUT http://localhost:3000/api/expense/:expense_id
 
+### DELETE
 1. DELETE http://localhost:3000/api/budget/:budget_id
 2. DELETE http://localhost:3000/api/expense/:expense_id
-
