@@ -12,7 +12,8 @@ const { register,
   postExpense, 
   getExpense, 
   putExpense, 
-  deleteExpense } = require('./controller'); 
+  deleteExpense,
+  getUsers } = require('./controller'); 
 
 const multer = require('multer');
 const storage = multer.memoryStorage(); 
@@ -26,6 +27,7 @@ router.post('/budget', postBudget);
 router.post('/auth/logout', logout);
 router.post('/expense', postExpense); 
 
+router.get('/:user_id', getUsers)
 router.get('/budgets/:user_id', getBudget);
 router.get('/expenses/:user_id', getExpense); 
 
