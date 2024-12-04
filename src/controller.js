@@ -250,6 +250,77 @@ const deleteExpense = async (req, res) => {
   }
 };
 
+//POST FINANCIAL GOALS API
+const createFinanGoals = async (req, res) => {
+  try {
+    const { user_id, goal_name, target_amount, current_amount, start_date, goal_deadline } = req.body;
+    const goal_id = uuidv4();
+    const db = await connectDB();
+
+    const query = "INSERT INTO saving_financial_goals (goal_id, user_id, goal_name, target_amount, current_amount, start_date, goal_deadline) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    const values = [goal_id, user_id, goal_name, target_amount, current_amount, start_date, goal_deadline];
+
+    await db.query(query, values);
+    res.status(201).json({ message: "Saving goals created successfully", goal_id });
+  } catch (error) {
+    res.status(500).json({ message: "Database error", error: error.message });
+  }
+};
+
+//GET FINANCIAL GOALS API
+const getFinanGoals = async (req, res) => {
+  try {
+    const { goal_id, user_id } = req.params;
+    const db = await connectDB();
+
+    const query = "SELECT * FROM saving_financial_goals WHERE goal_id = ? AND user_id = ?";
+    const [results] = await db.query(query, [goal_id, user_id]);
+
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: "Database error", error: error.message });
+  }
+};
+
+//PUT FINANCIAL GOALS API
+const updateFinanGoals = async (req, res) => {
+  try {
+    const { goal_id } = req.params;
+    const { goal_name, target_amount, current_amount, start_date, goal_deadline } = req.body;
+    const db = await connectDB();
+
+    const query = "UPDATE saving_financial_goals SET goal_name = ?, target_amount = ?, current_amount = ?, start_date = ?, goal_deadline = ? WHERE goal_id = ?";
+    const values = [goal_name, target_amount, current_amount, start_date, goal_deadline, goal_id];
+
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Goal not found" });
+    }
+
+    res.status(200).json({ message: "Goal updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Database error", error: error.message });
+  }
+};
+
+//DELETE FINANCIAL GOALS API
+const deleteFinanGoals = async (req, res) => {
+  try {
+    const { goal_id } = req.params;
+    const db = await connectDB();
+
+    const query = "DELETE FROM saving_financial_goals WHERE goal_id = ?";
+    const [result] = await db.query(query, [goal_id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Goal not found" });
+    }
+
+    res.status(200).json({ message: "Goal deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Database error", error: error.message });
+  }
+};
+
 module.exports = { register, 
   login, 
   postTransaction, 
@@ -263,4 +334,8 @@ module.exports = { register,
   getExpense, 
   putExpense, 
   deleteExpense,
-  getUsers };
+  getUsers,
+  createFinanGoals,
+  getFinanGoals,
+  updateFinanGoals,
+  deleteFinanGoals,};
