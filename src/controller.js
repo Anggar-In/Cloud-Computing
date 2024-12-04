@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
-const db = require("./connect");
+const connectDB = require("./connect");
 const { SECRET_KEY } = require('./config');
 const { processImage } = require('../machine_learning/OCR_Receipt');
 
@@ -9,6 +9,7 @@ const { processImage } = require('../machine_learning/OCR_Receipt');
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    const db = await connectDB();
     
     const [results] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
     if (results.length > 0) {
@@ -31,6 +32,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const db = await connectDB();
 
     const [results] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
     if (results.length === 0) {
@@ -58,6 +60,7 @@ const logout = (req, res) => {
 //GET users
 const getUsers = async (req, res) => {
     const { user_id } = req.params;
+    const db = await connectDB();
   
     db.query("SELECT * FROM users WHERE user_id = ?", [user_id], (err, results) => {
       if (err) return res.status(500).json({ message: "Database error", error: err });
@@ -70,6 +73,7 @@ const postTransaction = async (req, res) => {
   try {
     const { category_id, user_id, amount, date, description } = req.body;
     const transaction_id = uuidv4();
+    const db = await connectDB();
 
     const query = 'INSERT INTO transaction (transaction_id, category_id, user_id, amount, date, description) VALUES (?, ?, ?, ?, ?, ?)';
     const values = [transaction_id, category_id, user_id, amount, date, description];
@@ -86,7 +90,8 @@ const postReceipt = async (req, res) => {
   try {
       const receiptId = uuidv4();
       const fileBuffer = req.file.buffer;
-      const { text, receipt } = await processImage(fileBuffer); 
+      const { text, receipt } = await processImage(fileBuffer);
+      const db = await connectDB();
       
       const query = `INSERT INTO receipt_input (receipt_id, extracted_text) VALUES (?, ?)`;
       const values = [receiptId, text];
@@ -108,6 +113,7 @@ const postBudget = async (req, res) => {
   try {
     const { user_id, budget_name, total_amount, start_date, end_date } = req.body;
     const budget_id = uuidv4();
+    const db = await connectDB();
 
     const query = 'INSERT INTO budget_tools (Budget_ID, User_ID, Budget_Name, total_amount, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?)';
     const values = [budget_id, user_id, budget_name, total_amount, start_date, end_date];
@@ -123,6 +129,7 @@ const postBudget = async (req, res) => {
 const getBudget = async (req, res) => {
   try {
     const { user_id } = req.params;
+    const db = await connectDB();
 
     const query = 'SELECT * FROM budget_tools WHERE User_ID = ?';
     const [results] = await db.query(query, [user_id]);
@@ -138,6 +145,7 @@ const putBudget = async (req, res) => {
   try {
     const { budget_id } = req.params;
     const { budget_name, total_amount, start_date, end_date } = req.body;
+    const db = await connectDB();
 
     const query = 'UPDATE budget_tools SET Budget_Name = ?, total_amount = ?, start_date = ?, end_date = ? WHERE Budget_ID = ?';
     const values = [budget_name, total_amount, start_date, end_date, budget_id];
@@ -157,6 +165,7 @@ const putBudget = async (req, res) => {
 const deleteBudget = async (req, res) => {
   try {
     const { budget_id } = req.params;
+    const db = await connectDB();
 
     const query = 'DELETE FROM budget_tools WHERE Budget_ID = ?';
     const [result] = await db.query(query, [budget_id]);
@@ -175,6 +184,7 @@ const postExpense = async (req, res) => {
   try {
     const { user_id, category_id, expense_amount, expense_date, description } = req.body;
     const expense_id = uuidv4();
+    const db = await connectDB();
 
     const query = 'INSERT INTO expense (Expense_ID, User_ID, Category_ID, Expense_amount, Expense_date, Description) VALUES (?, ?, ?, ?, ?, ?)';
     const values = [expense_id, user_id, category_id, expense_amount, expense_date, description];
@@ -190,6 +200,7 @@ const postExpense = async (req, res) => {
 const getExpense = async (req, res) => {
   try {
     const { user_id } = req.params;
+    const db = await connectDB();
 
     const query = 'SELECT * FROM expense WHERE User_ID = ?';
     const [results] = await db.query(query, [user_id]);
@@ -205,6 +216,7 @@ const putExpense = async (req, res) => {
   try {
     const { expense_id } = req.params;
     const { category_id, expense_amount, expense_date, description } = req.body;
+    const db = await connectDB();
 
     const query = 'UPDATE expense SET Category_ID = ?, Expense_amount = ?, Expense_date = ?, Description = ? WHERE Expense_ID = ?';
     const values = [category_id, expense_amount, expense_date, description, expense_id];
@@ -224,6 +236,7 @@ const putExpense = async (req, res) => {
 const deleteExpense = async (req, res) => {
   try {
     const { expense_id } = req.params;
+    const db = await connectDB();
 
     const query = 'DELETE FROM expense WHERE Expense_ID = ?';
     const [result] = await db.query(query, [expense_id]);
