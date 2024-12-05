@@ -26,7 +26,12 @@ const {
   getIncome,
   putIncome,
   deleteIncome,
-  getUserProfile,voiceInput, putUserProfile, getReportAnalysis, getUsers, createFinanGoals,
+  getUserProfile,
+  voiceInput, 
+  putUserProfile, 
+  getReportAnalysis, 
+  getUsers, 
+  createFinanGoals,
   getFinanGoals,
   updateFinanGoals,
   deleteFinanGoals
