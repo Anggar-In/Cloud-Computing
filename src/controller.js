@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
-const connectDB = require("./connect");
+const connectDB = require('./connect');
 const { SECRET_KEY } = require('./config');
 const { processImage } = require('../machine_learning/OCR_Receipt');
 
@@ -36,87 +36,161 @@ const login = async (req, res) => {
 
     const [results] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
     if (results.length === 0) {
-      return res.status(400).json({ message: "Email not registered" });
+      return res.status(400).json({ message: "Email tidak terdaftar" });
     }
 
     const user = results[0];
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.status(400).json({ message: "Password salah" });
     }
-
-    const token = jwt.sign({ user_id: user.user_id }, SECRET_KEY, { expiresIn: '1h' });
-    res.status(200).json({ message: "Login successful", token });
+    const token = jwt.sign({ user_ID: user.user_ID }, SECRET_KEY, { expiresIn: '1h' });
+    res.status(200).json({ message: "Login berhasil", token });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Terjadi kesalahan server", error: error.message });
   }
 };
+
+//GET users
+const getUsers = async (req, res) => {
+  const { user_id } = req.params;
+  const db = await connectDB();
+
+  db.query("SELECT * FROM users WHERE user_id = ?", [user_id], (err, results) => {
+    if (err) return res.status(500).json({ message: "Database error", error: err });
+    res.status(200).json({ transactions: results });
+  });
+};
+
 
 const logout = (req, res) => {
 
   res.status(200).json({ message: "Logout successful" });
 };
 
-//GET users
-const getUsers = async (req, res) => {
-    const { user_id } = req.params;
-    const db = await connectDB();
-  
-    db.query("SELECT * FROM users WHERE user_id = ?", [user_id], (err, results) => {
-      if (err) return res.status(500).json({ message: "Database error", error: err });
-      res.status(200).json({ transactions: results });
-    });
-  };
-
-// Transaction POST API
-const postTransaction = async (req, res) => {
+const getUserProfile = async (req, res) => {
   try {
-    const { category_id, user_id, amount, date, description } = req.body;
-    const transaction_id = uuidv4();
+    const user_id = req.user_id; 
     const db = await connectDB();
 
-    const query = 'INSERT INTO transaction (transaction_id, category_id, user_id, amount, date, description) VALUES (?, ?, ?, ?, ?, ?)';
-    const values = [transaction_id, category_id, user_id, amount, date, description];
+    const query = 'SELECT * FROM user_profile WHERE user_id = ?';
+    const [results] = await db.query(query, [user_id]);
 
-    await db.query(query, values);
-    res.status(201).json({ message: 'Transaction added successfully', transaction_id });
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'User profile not found' });
+    }
+
+    res.status(200).json(results[0]); 
   } catch (error) {
     res.status(500).json({ message: 'Database error', error: error.message });
   }
 };
 
+const putUserProfile = async (req, res) => {
+  try {
+    const user_id = req.user_id; 
+    const { fullname, date_of_birth, phone_number } = req.body; 
+    const db = await connectDB();
+
+    const query = 'UPDATE user_profile SET fullname = ?, date_of_birth = ?, phone_number = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?';
+    const values = [fullname, date_of_birth, phone_number, user_id];
+
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'User profile not found' });
+    }
+
+    res.status(200).json({ message: 'User profile updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
+
 // POST OCR API 
 const postReceipt = async (req, res) => {
   try {
-      const receiptId = uuidv4();
-      const fileBuffer = req.file.buffer;
-      const { text, receipt } = await processImage(fileBuffer);
-      const db = await connectDB();
-      
-      const query = `INSERT INTO receipt_input (receipt_id, extracted_text) VALUES (?, ?)`;
-      const values = [receiptId, text];
-      await db.query(query, values);
+    const fileBuffer = req.file.buffer;
+    const { text, receipt } = await processImage(fileBuffer); 
 
-      res.status(200).json({
-          message: 'Receipt scanned successfully',
-          receipt_id: receiptId,
-          extracted_text: text,
-          parsed_receipt: receipt,  
-      });
+    const db = await connectDB();
+    const expense_id = uuidv4();
+    const user_id = req.user_id; 
+    const category_id = req.body.category_id; 
+    const expense_amount = parseFloat(receipt.total.replace(/\./g, '').replace(',', '.')); 
+    const expense_date = receipt.date ? new Date(receipt.date.split('-').reverse().join('-')) : new Date();
+
+    const [categoryCheck] = await db.query('SELECT * FROM category WHERE category_id = ?', [category_id]);
+    if (categoryCheck.length === 0) {
+      return res.status(400).json({ message: 'Invalid category ID' });
+    }
+
+    const query = `INSERT INTO expense (Expense_ID, User_ID, Category_ID, Expense_amount, Expense_date, store, items) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const values = [expense_id, user_id, category_id, expense_amount, expense_date, receipt.company, JSON.stringify(receipt.items)];
+
+    await db.query(query, values);
+
+    res.status(200).json({
+      message: 'Receipt scanned and expense recorded successfully',
+      expense_id,
+      extracted_text: text,
+      parsed_receipt: receipt,  
+    });
   } catch (error) {
-      res.status(500).json({ message: 'Error scanning receipt', error: error.message });
+    res.status(500).json({ message: 'Error scanning receipt', error: error.message });
   }
 };
+
+const voiceInput = async (req, res) => {
+  try {
+    const { transactionType, extractedData } = req.body;
+    const user_id = req.user_id; 
+    const db = await connectDB();
+    const category_id = req.headers['category_id']; 
+
+    const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
+    if (categoryCheck.length === 0) {
+      return res.status(400).json({ message: 'Invalid category ID' });
+    }
+
+    if (transactionType === 'expense') {
+      const expense_id = uuidv4();
+      const { total, date, items, company } = extractedData;
+
+      const query = `INSERT INTO expense (Expense_ID, User_ID, Category_ID, Expense_amount, Expense_date, store, items) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+      const values = [expense_id, user_id, category_id, total, date, company, JSON.stringify(items)];
+
+      await db.query(query, values);
+      res.status(201).json({ message: 'Expense recorded successfully', expense_id });
+    } else if (transactionType === 'income') {
+      const income_id = uuidv4();
+      const { total, date, company } = extractedData;
+
+      const query = `INSERT INTO income (income_id, user_id, category_id, income_amount, income_date, description) VALUES (?, ?, ?, ?, ?, ?)`;
+      const values = [income_id, user_id, category_id, total, date, company];
+
+      await db.query(query, values);
+      res.status(201).json({ message: 'Income recorded successfully', income_id });
+    } else {
+      return res.status(400).json({ message: 'Invalid transaction type' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
 
 // POST BUDGET API
 const postBudget = async (req, res) => {
   try {
-    const { user_id, budget_name, total_amount, start_date, end_date } = req.body;
-    const budget_id = uuidv4();
+    const { income_month, budget_month } = req.body;
+    const user_id = req.user_id; 
     const db = await connectDB();
+    const budget_id = uuidv4();
 
-    const query = 'INSERT INTO budget_tools (Budget_ID, User_ID, Budget_Name, total_amount, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?)';
-    const values = [budget_id, user_id, budget_name, total_amount, start_date, end_date];
+    const query = 'INSERT INTO budget_tools (budget_id, user_id, income_month, budget_month) VALUES (?, ?, ?, ?)';
+    const values = [budget_id, user_id, income_month, budget_month];
 
     await db.query(query, values);
     res.status(201).json({ message: 'Budget created successfully', budget_id });
@@ -125,13 +199,14 @@ const postBudget = async (req, res) => {
   }
 };
 
+
 // GET BUDGET API
 const getBudget = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user_id; 
     const db = await connectDB();
 
-    const query = 'SELECT * FROM budget_tools WHERE User_ID = ?';
+    const query = 'SELECT * FROM budget_tools WHERE user_id = ?';
     const [results] = await db.query(query, [user_id]);
 
     res.status(200).json(results);
@@ -144,15 +219,15 @@ const getBudget = async (req, res) => {
 const putBudget = async (req, res) => {
   try {
     const { budget_id } = req.params;
-    const { budget_name, total_amount, start_date, end_date } = req.body;
-    const db = await connectDB();
+    const user_id = req.user_id; 
+    const { income_month, budget_month } = req.body; 
 
-    const query = 'UPDATE budget_tools SET Budget_Name = ?, total_amount = ?, start_date = ?, end_date = ? WHERE Budget_ID = ?';
-    const values = [budget_name, total_amount, start_date, end_date, budget_id];
+    const query = 'UPDATE budget_tools SET income_month = ?, budget_month = ? WHERE budget_id = ? AND user_id = ?';
+    const values = [income_month, budget_month, budget_id, user_id];
 
     const [result] = await db.query(query, values);
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Budget not found' });
+      return res.status(404).json({ message: 'Budget not found or not owned by user' });
     }
 
     res.status(200).json({ message: 'Budget updated successfully' });
@@ -165,12 +240,13 @@ const putBudget = async (req, res) => {
 const deleteBudget = async (req, res) => {
   try {
     const { budget_id } = req.params;
+    const user_id = req.user_id; 
     const db = await connectDB();
 
-    const query = 'DELETE FROM budget_tools WHERE Budget_ID = ?';
-    const [result] = await db.query(query, [budget_id]);
+    const query = 'DELETE FROM budget_tools WHERE budget_id = ? AND user_id = ?';
+    const [result] = await db.query(query, [budget_id, user_id]);
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Budget not found' });
+      return res.status(404).json({ message: 'Budget not found or not owned by user' });
     }
 
     res.status(200).json({ message: 'Budget deleted successfully' });
@@ -182,12 +258,21 @@ const deleteBudget = async (req, res) => {
 // POST EXPENSE API
 const postExpense = async (req, res) => {
   try {
-    const { user_id, category_id, expense_amount, expense_date, description } = req.body;
-    const expense_id = uuidv4();
+    const { expense_amount, expense_date, store, items } = req.body;
+    const user_id = req.user_id; 
+    const category_id = req.headers['category_id'];
     const db = await connectDB();
+    const expense_id = uuidv4();
 
-    const query = 'INSERT INTO expense (Expense_ID, User_ID, Category_ID, Expense_amount, Expense_date, Description) VALUES (?, ?, ?, ?, ?, ?)';
-    const values = [expense_id, user_id, category_id, expense_amount, expense_date, description];
+    // Validasi category_id
+    const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
+    if (categoryCheck.length === 0 || categoryCheck[0].transaction_type !== 'expense') {
+      return res.status(400).json({ message: 'Invalid category for expense' });
+    }
+
+    // Query untuk menyimpan pengeluaran
+    const query = 'INSERT INTO expense (Expense_ID, User_ID, category_id, Expense_amount, Expense_date, store, items) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    const values = [expense_id, user_id, category_id, expense_amount, expense_date, store, JSON.stringify(items)];
 
     await db.query(query, values);
     res.status(201).json({ message: 'Expense created successfully', expense_id });
@@ -199,7 +284,7 @@ const postExpense = async (req, res) => {
 // GET EXPENSE API
 const getExpense = async (req, res) => {
   try {
-    const { user_id } = req.params;
+    const user_id = req.user_id;
     const db = await connectDB();
 
     const query = 'SELECT * FROM expense WHERE User_ID = ?';
@@ -214,12 +299,18 @@ const getExpense = async (req, res) => {
 // PUT EXPENSE API
 const putExpense = async (req, res) => {
   try {
-    const { expense_id } = req.params;
-    const { category_id, expense_amount, expense_date, description } = req.body;
+    const { expense_id } = req.params; 
+    const { expense_amount, expense_date, store, items } = req.body; 
+    const category_id = req.headers['category_id'];
     const db = await connectDB();
 
-    const query = 'UPDATE expense SET Category_ID = ?, Expense_amount = ?, Expense_date = ?, Description = ? WHERE Expense_ID = ?';
-    const values = [category_id, expense_amount, expense_date, description, expense_id];
+    const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
+    if (categoryCheck.length === 0 || categoryCheck[0].transaction_type !== 'expense') {
+      return res.status(400).json({ message: 'Invalid category for expense' });
+    }
+
+    const query = 'UPDATE expense SET Expense_amount = ?, Expense_date = ?, store = ?, items = ?, category_id = ? WHERE Expense_ID = ?';
+    const values = [expense_amount, expense_date, store, JSON.stringify(items), category_id, expense_id];
 
     const [result] = await db.query(query, values);
     if (result.affectedRows === 0) {
@@ -245,6 +336,301 @@ const deleteExpense = async (req, res) => {
     }
 
     res.status(200).json({ message: 'Expense deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
+// GET CATEGORY API
+const getCategory = async (req, res) => {
+  try {
+    const db = await connectDB();
+    const query = 'SELECT * FROM category WHERE transaction_type = "expense"';
+    const [results] = await db.query(query);
+
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
+// POST CATEGORY API
+const postCategory = async (req, res) => {
+  try {
+    const { name, transaction_type } = req.body; 
+    const db = await connectDB();
+    const category_id = uuidv4();
+
+    const query = 'INSERT INTO category (category_id, name, transaction_type) VALUES (?, ?, ?)';
+    const values = [category_id, name, transaction_type];
+
+    await db.query(query, values);
+    res.status(201).json({ message: 'Category created successfully', category_id });
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
+// PUT CATEGORY API
+const putCategory = async (req, res) => {
+  try {
+    const { category_id } = req.params;
+    const { name } = req.body;
+    const db = await connectDB();
+
+    const query = 'UPDATE category SET name = ? WHERE category_id = ?';
+    const values = [name, category_id];
+
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    res.status(200).json({ message: 'Category updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
+// DELETE CATEGORY API
+const deleteCategory = async (req, res) => {
+  try {
+    const { category_id } = req.params;
+    const db = await connectDB();
+
+    const query = 'DELETE FROM category WHERE category_id = ?';
+    const [result] = await db.query(query, [category_id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    res.status(200).json({ message: 'Category deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
+// POST INCOME API
+const postIncome = async (req, res) => {
+  try {
+    const { income_amount, income_date, description } = req.body; 
+    const user_id = req.user_id; 
+    const category_id = req.headers['category_id']; 
+    const db = await connectDB();
+    const income_id = uuidv4();
+
+    const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
+    if (categoryCheck.length === 0 || categoryCheck[0].transaction_type !== 'income') {
+      return res.status(400).json({ message: 'Invalid category for income' });
+    }
+
+    const query = 'INSERT INTO income (income_id, user_id, category_id, income_amount, income_date, description) VALUES (?, ?, ?, ?, ?, ?)';
+    const values = [income_id, user_id, category_id, income_amount, income_date, description];
+
+    await db.query(query, values);
+    res.status(201).json({ message: 'Income created successfully', income_id });
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
+// GET INCOME API
+const getIncome = async (req, res) => {
+  try {
+    const user_id = req.user_id; 
+    const db = await connectDB();
+
+    const query = 'SELECT * FROM income WHERE user_id = ?';
+    const [results] = await db.query(query, [user_id]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No income records found for this user' });
+    }
+
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
+// PUT INCOME API
+const putIncome = async (req, res) => {
+  try {
+    const { income_id } = req.params;
+    const { income_amount, income_date, description } = req.body;
+    const category_id = req.headers['category_id'];
+    const db = await connectDB();
+
+    const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
+    if (categoryCheck.length === 0 || categoryCheck[0].transaction_type !== 'income') {
+      return res.status(400).json({ message: 'Invalid category for income' });
+    }
+
+    const query = 'UPDATE income SET category_id = ?, income_amount = ?, income_date = ?, description = ? WHERE income_id = ?';
+    const values = [category_id, income_amount, income_date, description, income_id];
+
+    const [result] = await db.query(query, values);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Income not found' });
+    }
+
+    res.status(200).json({ message: 'Income updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
+// DELETE INCOME API
+const deleteIncome = async (req, res) => {
+  try {
+    const { income_id } = req.params;
+    const db = await connectDB();
+
+    const query = 'DELETE FROM income WHERE income_id = ?';
+    const [result] = await db.query(query, [income_id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Income not found' });
+    }
+
+    res.status(200).json({ message: 'Income deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Database error', error: error.message });
+  }
+};
+
+const getReportAnalysis = async (req, res) => {
+  try {
+    const user_id = req.user_id; 
+    const { period } = req.query;
+    const db = await connectDB();
+
+    let expenseQuery;
+    let values = [user_id];
+
+    if (period === 'daily') {
+      expenseQuery = `
+        SELECT 
+          DATE(e.Expense_date) AS report_date,
+          SUM(e.Expense_amount) AS total_expense
+        FROM expense e
+        WHERE e.user_id = ?
+        GROUP BY report_date
+      `;
+    } else if (period === 'weekly') {
+      expenseQuery = `
+        SELECT 
+          DATE(e.Expense_date) AS report_date,
+          SUM(e.Expense_amount) AS total_expense
+        FROM expense e
+        WHERE e.user_id = ?
+        GROUP BY report_date
+      `;
+    } else if (period === 'monthly') {
+      expenseQuery = `
+        SELECT 
+          DATE_FORMAT(e.Expense_date, '%Y-%m') AS report_date,
+          SUM(e.Expense_amount) AS total_expense
+        FROM expense e
+        WHERE e.user_id = ?
+        GROUP BY report_date
+      `;
+    } else {
+      return res.status(400).json({ message: 'Invalid period specified' });
+    }
+
+    const [expenseResults] = await db.query(expenseQuery, values);
+
+    const incomeQuery = `
+      SELECT 
+        DATE(income_date) AS report_date,
+        SUM(income_amount) AS total_income
+      FROM income
+      WHERE user_id = ?
+      GROUP BY report_date
+    `;
+    const [incomeResults] = await db.query(incomeQuery, values);
+
+    const totalIncome = incomeResults.reduce((acc, curr) => acc + (parseFloat(curr.total_income) || 0), 0);
+    const totalExpense = expenseResults.reduce((acc, curr) => acc + (parseFloat(curr.total_expense) || 0), 0);
+    const netBalance = totalIncome - totalExpense;
+
+    const incomePercentage = totalIncome > 0 ? ((totalIncome / (totalIncome + totalExpense)) * 100).toFixed(2) : 0;
+    const expensePercentage = totalExpense > 0 ? ((totalExpense / (totalIncome + totalExpense)) * 100).toFixed(2) : 0;
+
+    const categoryQuery = `
+      SELECT c.name, SUM(e.Expense_amount) AS total_expense
+      FROM expense e
+      JOIN category c ON e.category_id = c.category_id
+      WHERE e.user_id = ?
+      GROUP BY c.name
+      ORDER BY total_expense DESC
+      LIMIT 5
+    `;
+    const [categoryResults] = await db.query(categoryQuery, [user_id]);
+
+    let response = {
+      totalIncome,
+      totalExpense,
+      netBalance,
+      incomePercentage,
+      expensePercentage,
+      categories: categoryResults
+    };
+
+    if (period === 'daily') {
+      const dailyExpenses = {};
+      const dailyIncome = {};
+      expenseResults.forEach(result => {
+        dailyExpenses[result.report_date] = parseFloat(result.total_expense) || 0;
+      });
+      incomeResults.forEach(result => {
+        dailyIncome[result.report_date] = parseFloat(result.total_income) || 0;
+      });
+      response.daily_expenses = dailyExpenses;
+      response.daily_income = dailyIncome;
+    } else if (period === 'weekly') {
+      const weeklyExpenses = {};
+      const weeklyIncome = {};
+      
+      expenseResults.forEach(result => {
+        const date = new Date(result.report_date);
+        const weekNumber = Math.ceil(date.getDate() / 7);
+        const monthName = date.toLocaleString('default', { month: 'long' });
+        const key = `${monthName} week ${weekNumber}`;
+        weeklyExpenses[key] = (weeklyExpenses[key] || 0) + (parseFloat(result.total_expense) || 0);
+      });
+      
+      incomeResults.forEach(result => {
+        const date = new Date(result.report_date);
+        const weekNumber = Math.ceil(date.getDate() / 7);
+        const monthName = date.toLocaleString('default', { month: 'long' });
+        const key = `${monthName} week ${weekNumber}`;
+        weeklyIncome[key] = (weeklyIncome[key] || 0) + (parseFloat(result.total_income) || 0);
+      });
+      
+      response.weekly_expenses = weeklyExpenses;
+      response.weekly_income = weeklyIncome;
+    } else if (period === 'monthly') {
+      const monthlyExpenses = {};
+      const monthlyIncome = {};
+      
+      expenseResults.forEach(result => {
+        const date = new Date(result.report_date);
+        const monthName = date.toLocaleString('default', { month: 'long' });
+        monthlyExpenses[monthName] = (monthlyExpenses[monthName] || 0) + (parseFloat(result.total_expense) || 0);
+      });
+      
+      incomeResults.forEach(result => {
+        const date = new Date(result.report_date);
+        const monthName = date.toLocaleString('default', { month: 'long' });
+        monthlyIncome[monthName] = (monthlyIncome[monthName] || 0) + (parseFloat(result.total_income) || 0);
+      });
+      
+      response.monthly_expenses = monthlyExpenses;
+      response.monthly_income = monthlyIncome;
+    }
+
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: 'Database error', error: error.message });
   }
@@ -321,9 +707,9 @@ const deleteFinanGoals = async (req, res) => {
   }
 };
 
+
 module.exports = { register, 
   login, 
-  postTransaction, 
   postReceipt, 
   postBudget, 
   getBudget, 
@@ -333,9 +719,21 @@ module.exports = { register,
   postExpense, 
   getExpense, 
   putExpense, 
-  deleteExpense,
-  getUsers,
-  createFinanGoals,
-  getFinanGoals,
-  updateFinanGoals,
-  deleteFinanGoals,};
+  deleteExpense, 
+  getCategory, 
+  postCategory, 
+  putCategory, 
+  deleteCategory, 
+  postIncome, 
+  getIncome, 
+  putIncome, 
+  deleteIncome, 
+  putUserProfile, 
+  getUserProfile, 
+  voiceInput, 
+  getReportAnalysis, 
+  getUsers, 
+  createFinanGoals, 
+  getFinanGoals, 
+  updateFinanGoals, 
+  deleteFinanGoals };
