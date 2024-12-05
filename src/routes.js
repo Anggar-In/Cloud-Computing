@@ -1,50 +1,74 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
+const auth = require('./auth'); 
+const multer = require('multer');
+const storage = multer.memoryStorage(); 
+const upload = multer({ storage });
+
 const {
   register,
   login,
-  postTransaction,
+  logout,
   postReceipt,
   postBudget,
   getBudget,
   putBudget,
   deleteBudget,
-  logout,
   postExpense,
   getExpense,
   putExpense,
   deleteExpense,
-  getUsers,
-  createFinanGoals,
+  getCategory,
+  postCategory,
+  putCategory,
+  deleteCategory,
+  postIncome,
+  getIncome,
+  putIncome,
+  deleteIncome,
+  getUserProfile,voiceInput, putUserProfile, getReportAnalysis, getUsers, createFinanGoals,
   getFinanGoals,
   updateFinanGoals,
-  deleteFinanGoals,
-} = require("./controller");
+  deleteFinanGoals
+} = require('./controller');
 
-const multer = require("multer");
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-router.post("/auth/register", register);
-router.post("/auth/login", login);
-router.post("/transaction", postTransaction);
-router.post("/upload-receipt", upload.single("receipt"), postReceipt);
-router.post("/budget", postBudget);
-router.post("/auth/logout", logout);
-router.post("/expense", postExpense);
-router.post("/financial-goals", createFinanGoals);
-
+router.post('/auth/register', register);
+router.post('/auth/login', login);
+router.post('/auth/logout', logout);
 router.get("/:user_id", getUsers);
-router.get("/budgets/:user_id", getBudget);
-router.get("/expenses/:user_id", getExpense);
+
+router.post('/upload-receipt', auth, upload.single('receipt'), postReceipt);
+
+router.post('/budget', auth, postBudget);
+router.get('/budget/:user_id', auth, getBudget);
+router.put('/budget/:budget_id', auth, putBudget);
+router.delete('/budget/:budget_id', auth, deleteBudget);
+
+router.post('/expense', auth, postExpense);
+router.get('/expense/:user_id', auth, getExpense);
+router.put('/expense/:expense_id', auth, putExpense);
+router.delete('/expense/:expense_id', auth, deleteExpense);
+
+router.get('/category', auth, getCategory);
+router.post('/category', auth, postCategory);
+router.put('/category/:category_id', auth, putCategory);
+router.delete('/category/:category_id', auth, deleteCategory);
+
+router.post('/income', auth, postIncome);
+router.get('/income/:user_id', auth, getIncome);
+router.put('/income/:income_id', auth, putIncome);
+router.delete('/income/:income_id', auth, deleteIncome);
+
+router.get('/user/profile', auth, getUserProfile);
+router.put('/user/profile', auth, putUserProfile);
+
+router.post('/voice-input', auth, voiceInput);
+
+router.get('/report-analysis', auth, getReportAnalysis);
+
+router.post("/financial-goals", createFinanGoals);
 router.get("/financial-goals/:user_id/:goal_id", getFinanGoals);
-
-router.put("/budget/:budget_id", putBudget);
-router.put("/expense/:expense_id", putExpense);
 router.put("/financial-goals/:user_id/:goal_id", updateFinanGoals);
-
-router.delete("/budget/:budget_id", deleteBudget);
-router.delete("/expense/:expense_id", deleteExpense);
 router.delete("/financial-goals/:user_id/:goal_id", deleteFinanGoals);
 
 module.exports = router;
