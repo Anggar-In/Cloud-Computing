@@ -22,47 +22,54 @@ class SpeechToTextExtractor {
 
     parseDate(phrase) {
         const today = new Date();
-
+        console.log("Input Phrase:", phrase);
+    
         if (phrase.includes('hari ini')) return this.formatDate(today);
         if (phrase.includes('kemarin')) {
             const yesterday = new Date(today);
             yesterday.setDate(today.getDate() - 1);
             return this.formatDate(yesterday);
         }
-
+    
         const daysAgoMatch = phrase.match(/(\d+)\s*hari(?:\s+yang)?\s+lalu/);
         if (daysAgoMatch) {
             const daysAgo = parseInt(daysAgoMatch[1]);
             const calculatedDate = new Date(today);
             calculatedDate.setDate(today.getDate() - daysAgo);
+            console.log("Calculated Date for days ago:", calculatedDate);
             return this.formatDate(calculatedDate);
         }
-
+    
         const patterns = [
-            /(\d{1,2})\s+(\w+)\s+(\d{4})/,
-            /(\d{1,2})\s+(\w+)/
+            /(\d{1,2})\s+(\w+)\s+(\d{4})/, 
+            /(\d{1,2})\s+(\w+)/,            
+            /(\d{4})-(\d{1,2})-(\d{1,2})/  
         ];
-
+    
         for (const pattern of patterns) {
             const match = phrase.match(pattern);
             if (match) {
+                console.log("Match found:", match); 
                 if (match.length === 4) {
                     const [, day, monthStr, year] = match;
                     const month = MONTHS[monthStr.toLowerCase()] || '01';
-                    return `${day.padStart(2, '0')}-${month}-${year}`;
+                    return `${year}-${month}-${day.padStart(2, '0')}`;
                 } else if (match.length === 3) {
                     const [, day, monthStr] = match;
                     const month = MONTHS[monthStr.toLowerCase()] || '01';
-                    return `${day.padStart(2, '0')}-${month}-${today.getFullYear()}`;
+                    return `${today.getFullYear()}-${month}-${day.padStart(2, '0')}`;
+                } else if (match.length === 3) {
+                    const [, year, month, day] = match;
+                    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
                 }
             }
         }
-
+    
         return null;
     }
-
+    
     formatDate(date) {
-        return `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     }
 
     parseTotalAmount(totalStr) {
