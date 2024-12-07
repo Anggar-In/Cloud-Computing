@@ -27,20 +27,21 @@ const {
   putIncome,
   deleteIncome,
   getUserProfile,
-  voiceInput, 
+  postVoiceInput, 
   putUserProfile, 
   getReportAnalysis, 
   getUsers, 
   createFinanGoals,
   getFinanGoals,
   updateFinanGoals,
-  deleteFinanGoals
+  deleteFinanGoals, verifyOTP
 } = require('./controller');
 
 router.post('/auth/register', register);
 router.post('/auth/login', login);
 router.post('/auth/logout', logout);
 router.get("/:user_id", getUsers);
+router.post('/auth/verify-otp', verifyOTP); 
 
 router.post('/upload-receipt', auth, upload.single('receipt'), postReceipt);
 
@@ -67,7 +68,7 @@ router.delete('/income/:income_id', auth, deleteIncome);
 router.get('/user/profile', auth, getUserProfile);
 router.put('/user/profile', auth, putUserProfile);
 
-router.post('/voice-input', auth, voiceInput);
+router.post('/voice-input', auth, postVoiceInput);
 
 router.get('/report-analysis', auth, getReportAnalysis);
 
