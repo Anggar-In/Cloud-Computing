@@ -26,11 +26,13 @@ Sebelum memulai, pastikan telah menginstal :
   - `name` as string
   - `email` as string, must be unique
   - `password` as string, must be at least 8 characters
+- **Request Body**:
 ```
 {
-  "message": "Registration successful, OTP sent to email"
+  "name": "namamu",
+  "email": "akunmu@example.com",
+  "password": "passwordmu"
 }
-
 ```
 - **Response**:
 json { "error": false, "message": "Registration successful, OTP sent to email" }
@@ -42,6 +44,13 @@ json { "error": false, "message": "Registration successful, OTP sent to email" }
 - **Request Body**:
   - `email` as string
   - `otp` as string
+- **Request Body**:
+```
+{
+  "email": "akunmu@example.com",
+  "otp": "otp_mu"
+}
+```
 - **Response**:
 json { "error": false, "message": "OTP verified successfully" }
 
@@ -51,6 +60,12 @@ json { "error": false, "message": "OTP verified successfully" }
 - **Method**: `POST`
 - **Request Body**:
   - `email` as string
+- **Request Body**:
+```
+{
+  "email": "akunmu@example.com""
+}
+```
 - **Response**:
 json { "error": false, "message": "OTP baru telah dikirim ke email Anda." }
 
@@ -61,6 +76,13 @@ json { "error": false, "message": "OTP baru telah dikirim ke email Anda." }
 - **Request Body**:
   - `email` as string
   - `password` as string
+- **Request Body**:
+```
+{
+  "email": "akunmu@example.com",
+  "password": "passwordmu"
+}
+```
 - **Response**:
 json { "error": false, "message": "Login berhasil", "token": "your_jwt_token" }
 
@@ -75,6 +97,8 @@ json { "transactions": [ { "user_id": "user_id_value", "name": "user_name", "ema
 
 - **URL**: `/auth/logout`
 - **Method**: `POST`
+- **Authorization**:
+  - `Bearer Token {{token}}`
 - **Response**:
 json { "message": "Logout successful" }
 
