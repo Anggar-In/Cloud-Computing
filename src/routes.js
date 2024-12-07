@@ -34,14 +34,16 @@ const {
   createFinanGoals,
   getFinanGoals,
   updateFinanGoals,
-  deleteFinanGoals, verifyOTP
-} = require('./controller');
+  deleteFinanGoals,
+  verifyOTP, 
+  resendOTP} = require('./controller');
 
 router.post('/auth/register', register);
 router.post('/auth/login', login);
 router.post('/auth/logout', logout);
 router.get("/:user_id", getUsers);
 router.post('/auth/verify-otp', verifyOTP); 
+router.post('/resend-otp', resendOTP);
 
 router.post('/upload-receipt', auth, upload.single('receipt'), postReceipt);
 
