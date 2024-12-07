@@ -1,0 +1,69 @@
+NORMAL BELUM SELESAI : 
+
+YANG PAKAI LIBRARY / MODEL ML :
+
+
+YANG SUDAH SELESAI :
+
+Budget API
+Create Budget API: Untuk membuat anggaran baru
+Get Budgets API: Untuk mengambil daftar anggaran pengguna
+Update Budget API: Untuk memperbarui informasi anggaran yang ada
+Delete Budget API: Untuk menghapus anggaran yang tidak diperlukan
+
+Category API
+Get Categories API: Untuk mengambil daftar kategori pendapatan dan pengeluaran
+Create Category API: Untuk menambahkan kategori baru
+Update Category API: Untuk memperbarui kategori yang ada
+Delete Category API: Untuk menghapus kategori yang tidak diperlukan
+
+Receipt Input OCR API :
+Create Receipt Input API: Untuk mencatat input dari struk baru
+Get Receipt Inputs API: Untuk mengambil daftar input struk pengguna
+
+Income Management API
+Create Income API: Untuk mencatat pendapatan baru
+Get Incomes API: Untuk mengambil daftar pendapatan pengguna
+Update Income API: Untuk memperbarui informasi pendapatan
+Delete Income API: Untuk menghapus catatan pendapatan
+
+Expense Management API
+Create Expense API: Untuk mencatat pengeluaran baru
+Get Expenses API: Untuk mengambil daftar pengeluaran pengguna
+Update Expense API: Untuk memperbarui informasi pengeluaran
+Delete Expense API: Untuk menghapus catatan pengeluaran
+
+User Authentication API
+Register User API: Untuk mendaftar pengguna baru
+Login API: Untuk autentikasi pengguna dan mendapatkan token akses
+Logout API: Untuk mengeluarkan pengguna dari sesi aktif
+
+Tabungan API
+Create Saving Goal API: Untuk menetapkan tujuan tabungan baru
+Get Saving Goal API: Untuk mengambil daftar tujuan tabungan pengguna
+Update Saving Goal API: Untuk memperbarui informasi tujuan tabungan
+Delete Saving Goal API: Untuk menghapus tujuan tabungan yang tidak lagi relevan
+
+User Profile API
+Get User Profile API: Untuk mengambil informasi profil pengguna berdasarkan user_id
+Update User Profile API: Untuk memperbarui detail profil pengguna seperti nama lengkap, email, tanggal lahir, nomor telepon
+
+Voice Input API :
+Create Voice Input API: Untuk mencatat input suara baru
+
+Financial Analysis / Report API
+Get Financial Reports API: Untuk mengambil laporan keuangan pengguna
+
+Investment Recommendation API 
+Get Investment Recommendation API: Untuk mengambil rekomendasi investasi berdasarkan profil pengguna
+
+TO DO LIST :
+
+1. menyelesaikan api api ini
+2. password belum di sensor ( saran ulhaq )
+3. post api beberapa belum per user id, jadi masih masukin user id ke json sehingga user id dan id lain malah bisa ke edit
+
+NOTE :
+
+1. masih nanya ke MD soal user profile mau dimasukin apa aja data diri nya
+
