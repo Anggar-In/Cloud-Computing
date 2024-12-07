@@ -6,29 +6,40 @@ const { SECRET_KEY } = require('./config');
 const { processImage } = require('../machine_learning/OCR_Receipt');
 const SpeechToTextExtractor = require('../machine_learning/voiceInput');
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 const sendOTP = async (email, otp) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'anggarinteam@gmail.com', 
-      pass: 'timanggarin' 
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
     }
   });
 
   const mailOptions = {
-    from: 'anggarinteam@gmail.com',
+    from: process.env.EMAIL_USER,
     to: email,
-    subject: 'Your OTP Code',
-    html: `<p>Your OTP code is: <strong>${otp}</strong></p>` 
+    subject: 'Your OTP Code for Anggar.In - Financial Tracker',
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; border-radius: 5px; max-width: 600px; margin: auto;">
+        <div style="text-align: center; padding: 10px;">
+          <h1 style="color: #4CAF50;">Welcome to Anggar.In!</h1>
+          <img src="${process.env.LOGO_URL}" alt="Anggar.In Logo" style="width: 150px;"/>
+        </div>
+        <h2 style="color: #333;">Hello!</h2>
+        <p>Thank you for registering with <strong>Anggar.In</strong>, your personal finance tracker.</p>
+        <p>Your One-Time Password (OTP) for verification is:</p>
+        <h1 style="font-size: 24px; color: #4CAF50; text-align: center; padding: 10px; border: 2px dashed #4CAF50; display: inline-block;">${otp}</h1>
+        <p>Please enter this code in the application to complete your registration.</p>
+        <p>If you did not request this, please ignore this email.</p>
+        <hr style="border: 1px solid #ccc;">
+        <p style="color: #777;">Best regards,<br>The Anggar.In Team</p>
+      </div>
+    `
   };
 
-  try {
-    await transporter.sendMail(mailOptions);
-  } catch (error) {
-    console.error("Error sending OTP email:", error);
-    throw new Error("Failed to send OTP email");
-  }
+  await transporter.sendMail(mailOptions);
 };
 
 // Register API
@@ -67,13 +78,55 @@ const verifyOTP = async (req, res) => {
   const [results] = await db.query("SELECT * FROM otp_verification WHERE otp = ? AND user_id = (SELECT user_id FROM users WHERE email = ?)", [otp, email]);
 
   if (results.length > 0) {
-    await db.query("UPDATE users SET is_verified = 1 WHERE email = ?", [email]);
+    await db.query("UPDATE users SET verified = 1 WHERE email = ?", [email]);
     await db.query("DELETE FROM otp_verification WHERE user_id = (SELECT user_id FROM users WHERE email = ?)", [email]); // Remove OTP after verification
     res.status(200).json({ message: "OTP verified successfully" });
   } else {
     res.status(400).json({ message: "Invalid OTP" });
   }
 };
+
+const resendOTP = async (req, res) => {
+  const { email } = req.body;
+
+  const db = await connectDB();
+  const [userResults] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+
+
+  if (userResults.length === 0) {
+    return res.status(400).json({ message: "Email tidak terdaftar" });
+  }
+
+  const user = userResults[0]; 
+
+  if (user.verified) {
+    return res.status(400).json({ message: "Akun Anda sudah terverifikasi." });
+  }
+
+  const [otpResults] = await db.query("SELECT * FROM otp_verification WHERE user_id = ?", [user.user_ID]);
+
+  if (otpResults.length > 0) {
+    const lastSentAt = new Date(otpResults[0].sent_at);
+    const now = new Date();
+    const timeDiff = (now - lastSentAt) / 1000;
+
+    if (timeDiff < 60) {
+      return res.status(400).json({ message: "Tunggu 1 menit sebelum mengirim ulang OTP." });
+    }
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  await sendOTP(email, otp);
+
+  if (otpResults.length > 0) {
+    await db.query("UPDATE otp_verification SET otp = ?, sent_at = ? WHERE user_id = ?", [otp, new Date(), user.user_ID]);
+  } else {
+    await db.query("INSERT INTO otp_verification (user_id, otp, sent_at) VALUES (?, ?, ?)", [user.user_ID, otp, new Date()]);
+  }
+
+  res.status(200).json({ message: "OTP baru telah dikirim ke email Anda." });
+};
+
 
 // Login API
 const login = async (req, res) => {
@@ -88,16 +141,22 @@ const login = async (req, res) => {
 
     const user = results[0];
 
+    if (!user.verified) {
+      return res.status(403).json({ message: "Akun Anda belum terverifikasi. Silakan periksa email Anda untuk OTP." });
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Password salah" });
     }
+
     const token = jwt.sign({ user_ID: user.user_ID }, SECRET_KEY, { expiresIn: '1h' });
     res.status(200).json({ message: "Login berhasil", token });
   } catch (error) {
     res.status(500).json({ message: "Terjadi kesalahan server", error: error.message });
   }
 };
+
 
 //GET users
 const getUsers = async (req, res) => {
@@ -192,42 +251,48 @@ const postReceipt = async (req, res) => {
 // POST VOICE INPUT API
 const postVoiceInput = async (req, res) => {
   try {
-    const { transactionType, fullTranscriptText } = req.body;
-    const user_id = req.user_id; 
-    const db = await connectDB();
-    const category_id = req.headers['category_id']; 
-    const extractor = new SpeechToTextExtractor();
-    const extractedData = extractor.extractData(fullTranscriptText);
-    const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
-    if (categoryCheck.length === 0) {
-      return res.status(400).json({ message: 'Invalid category ID' });
-    }
+      const { fullTranscriptText } = req.body;
+      const user_id = req.user_id; 
+      const db = await connectDB();
+      const category_id = req.headers['category_id']; 
+      const extractor = new SpeechToTextExtractor();
+      const extractedData = extractor.extractData(fullTranscriptText);
 
-    if (transactionType === 'expense') {
-      const expense_id = uuidv4();
-      const { Total, Date, Items, Company } = extractedData;
+      let transactionType;
+      if (extractedData && extractedData.Type === 'Pengeluaran') {
+          transactionType = 'expense';
+      } else if (extractedData && extractedData.Type === 'Pemasukan') {
+          transactionType = 'income';
+      } else {
+          return res.status(400).json({ message: 'Invalid transaction type detected' });
+      }
 
-      const query = `INSERT INTO expense (Expense_ID, User_ID, Category_ID, Expense_amount, Expense_date, store, items) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-      const values = [expense_id, user_id, category_id, Total, Date, Company, JSON.stringify(Items)];
+      if (transactionType === 'expense') {
+          const expense_id = uuidv4();
+          const { Total, Date: rawDate, Items, Company } = extractedData;
 
-      await db.query(query, values);
-      res.status(201).json({ message: 'Expense recorded successfully', expense_id });
-    } 
+          console.log("Final Date for Insertion:", date); 
 
-    else if (transactionType === 'income') {
-      const income_id = uuidv4();
-      const { Total, Date, Company } = extractedData;
+          const query = `INSERT INTO expense (Expense_ID, User_ID, Category_ID, Expense_amount, Expense_date, store, items) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+          const values = [expense_id, user_id, category_id, Total, date, Company, JSON.stringify(Items)];
 
-      const query = `INSERT INTO income (income_id, user_id, category_id, income_amount, income_date, description) VALUES (?, ?, ?, ?, ?, ?)`;
-      const values = [income_id, user_id, category_id, Total, Date, Company];
+          await db.query(query, values);
+          res.status(201).json({ message: 'Expense recorded successfully', expense_id });
+      } else if (transactionType === 'income') {
+          const income_id = uuidv4();
+          const { Total, Date: rawDate, Company } = extractedData;
 
-      await db.query(query, values);
-      res.status(201).json({ message: 'Income recorded successfully', income_id });
-    } else {
-      return res.status(400).json({ message: 'Invalid transaction type' });
-    }
+          console.log("Final Date for Insertion:", date);
+
+          const query = `INSERT INTO income (income_id, user_id, category_id, income_amount, income_date, description) VALUES (?, ?, ?, ?, ?, ?)`;
+          const values = [income_id, user_id, category_id, Total, date, Company];
+
+          await db.query(query, values);
+          res.status(201).json({ message: 'Income recorded successfully', income_id });
+      }
   } catch (error) {
-    res.status(500).json({ message: 'Database error', error: error.message });
+      console.error("Database error:", error);
+      res.status(500).json({ message: 'Database error', error: error.message });
   }
 };
 
@@ -788,4 +853,5 @@ module.exports = { register,
   updateFinanGoals, 
   deleteFinanGoals, 
   postVoiceInput, 
-  verifyOTP };
+  verifyOTP,
+  resendOTP };
