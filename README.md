@@ -118,6 +118,14 @@ json { "user_id": "user_id_value", "fullname": "user_name", "date_of_birth": "YY
 - **Method**: `PUT`
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
+- **Request Body**:
+```
+{
+  "fullname": "John Doe",
+  "date_of_birth": "1990-01-01",
+  "phone_number": "1234567890"
+}
+```
 - **Response**:
 json { "fullname": "user_name", "date_of_birth": "YYYY-MM-DD", "phone_number": "1234567890" }
 
@@ -374,6 +382,16 @@ json { "totalIncome": 1000000, "totalExpense": 50000, "netBalance": 950000, "inc
 
 - **URL**: `/financial-goals`
 - **Method**: `POST`
+- **Request Body**:
+```
+{
+  "goal_name": "Buy a Car",
+  "target_amount": 20000,
+  "current_amount": 5000,
+  "start_date": "2024-01-01",
+  "goal_deadline": "2025-01-01"
+}
+```
 - **Response**:
 json { "message": "Saving goals created successfully", "goal_id": "goal_id_value" }
 
@@ -388,6 +406,15 @@ json { "goal_id": "goal_id_value", "user_id": "user_id_value", "goal_name": "Sav
 
 - **URL**: `/financial-goals/:user_id/:goal_id`
 - **Method**: `PUT`
+```
+{
+  "goal_name": "Buy a House",
+  "target_amount": 50000,
+  "current_amount": 10000,
+  "start_date": "2024-01-01",
+  "goal_deadline": "2026-01-01"
+}
+```
 - **Response**:
 json { "message": "Goal updated successfully" }
 
