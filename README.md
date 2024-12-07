@@ -18,7 +18,7 @@ Sebelum memulai, pastikan telah menginstal :
 
 ## Set Up To Test API
 
-### User Registration
+### 1. User Registration
 
 - **URL**: `/auth/register`
 - **Method**: `POST`
@@ -37,7 +37,7 @@ Sebelum memulai, pastikan telah menginstal :
 - **Response**:
 json { "error": false, "message": "Registration successful, OTP sent to email" }
 
-### Verify OTP
+### 2. Verify OTP
 
 - **URL**: `/auth/verify-otp`
 - **Method**: `POST`
@@ -54,7 +54,7 @@ json { "error": false, "message": "Registration successful, OTP sent to email" }
 - **Response**:
 json { "error": false, "message": "OTP verified successfully" }
 
-### Resend OTP
+### 3. Resend OTP
 
 - **URL**: `/resend-otp`
 - **Method**: `POST`
@@ -69,7 +69,7 @@ json { "error": false, "message": "OTP verified successfully" }
 - **Response**:
 json { "error": false, "message": "OTP baru telah dikirim ke email Anda." }
 
-### User Login
+### 4. User Login
 
 - **URL**: `/auth/login`
 - **Method**: `POST`
@@ -86,14 +86,14 @@ json { "error": false, "message": "OTP baru telah dikirim ke email Anda." }
 - **Response**:
 json { "error": false, "message": "Login berhasil", "token": "your_jwt_token" }
 
-### Get User by ID
+### 5. Get User by ID
 
 - **URL**: `/:user_id`
 - **Method**: `GET`
 - **Response**:
 json { "transactions": [ { "user_id": "user_id_value", "name": "user_name", "email": "user@example.com" } ] }
 
-### Logout
+### 6. Logout
 
 - **URL**: `/auth/logout`
 - **Method**: `POST`
@@ -103,7 +103,7 @@ json { "transactions": [ { "user_id": "user_id_value", "name": "user_name", "ema
 json { "message": "Logout successful" }
 
 
-### Get User Profile
+### 7. Get User Profile
 
 - **URL**: `/user/profile`
 - **Method**: `GET`
@@ -112,7 +112,7 @@ json { "message": "Logout successful" }
 - **Response**:
 json { "user_id": "user_id_value", "fullname": "user_name", "date_of_birth": "YYYY-MM-DD", "phone_number": "1234567890" }
 
-### Update User Profile
+### 8. Update User Profile
 
 - **URL**: `/user/profile`
 - **Method**: `PUT`
@@ -121,7 +121,7 @@ json { "user_id": "user_id_value", "fullname": "user_name", "date_of_birth": "YY
 - **Response**:
 json { "fullname": "user_name", "date_of_birth": "YYYY-MM-DD", "phone_number": "1234567890" }
 
-### Post Voice Input
+### 9. Post Voice Input
 
 - **URL**: `/voice-input`
 - **Method**: `POST`
@@ -138,7 +138,7 @@ json { "fullname": "user_name", "date_of_birth": "YYYY-MM-DD", "phone_number": "
 json { "error": false, "message": "Income recorded successfully", "income_id": "income_id_value" }
 
 
-### Post Receipt
+### 10. Post Receipt
 
 - **URL**: `/upload-receipt`
 - **Method**: `POST`
@@ -149,7 +149,7 @@ json { "error": false, "message": "Income recorded successfully", "income_id": "
 - **Response**:
 json { "message": "Receipt scanned and expense recorded successfully", "expense_id": "expense_id_value", "extracted_text": "extracted_text_value", "parsed_receipt": { "company": "Company Name", "total": "Total Amount", "items": ["Item 1", "Item 2"] } }
 
-### Post Budget
+### 11. Post Budget
 
 - **URL**: `/budget`
 - **Method**: `POST`
@@ -165,7 +165,7 @@ json { "message": "Receipt scanned and expense recorded successfully", "expense_
 - **Response**:
 json { "message": "Budget created successfully", "budget_id": "budget_id_value" }
 
-### Get Budget
+### 12. Get Budget
 
 - **URL**: `/budget/:user_id`
 - **Method**: `GET`
@@ -174,7 +174,7 @@ json { "message": "Budget created successfully", "budget_id": "budget_id_value" 
 - **Response**:
 json [ { "budget_id": "budget_id_value", "user_id": "user_id_value", "income_month": "1000000", "budget_month": "800000" } ]
 
-### Update Budget
+### 13. Update Budget
 
 - **URL**: `/budget/:budget_id`
 - **Method**: `PUT`
@@ -190,7 +190,7 @@ json [ { "budget_id": "budget_id_value", "user_id": "user_id_value", "income_mon
 - **Response**:
 json { "message": "Budget updated successfully" }
 
-### Delete Budget
+### 14. Delete Budget
 
 - **URL**: `/budget/:budget_id`
 - **Method**: `DELETE`
@@ -199,7 +199,7 @@ json { "message": "Budget updated successfully" }
 - **Response**:
 json { "message": "Budget deleted successfully" }
 
-### Post Expense
+### 15. Post Expense
 
 - **URL**: `/expense`
 - **Method**: `POST`
@@ -219,7 +219,7 @@ json { "message": "Budget deleted successfully" }
 json { "message": "Expense created successfully", "expense_id": "expense_id_value" }
 
 
-### Get Expense
+### 16. Get Expense
 
 - **URL**: `/expense/:user_id`
 - **Method**: `GET`
@@ -229,7 +229,7 @@ json { "message": "Expense created successfully", "expense_id": "expense_id_valu
 json [ { "Expense_ID": "expense_id_value", "User_ID": "user_id_value", "Expense_amount": 50000, "Expense_date": "2024-12-01", "store": "Store Name", "items": ["Item 1", "Item 2"] } ]
 
 
-### Update Expense
+### 17. Update Expense
 
 - **URL**: `/expense/:expense_id`
 - **Method**: `PUT`
@@ -248,7 +248,7 @@ json [ { "Expense_ID": "expense_id_value", "User_ID": "user_id_value", "Expense_
 - **Response**:
 json { "message": "Expense updated successfully" }
 
-### Delete Expense
+### 18. Delete Expense
 
 - **URL**: `/expense/:expense_id`
 - **Method**: `DELETE`
@@ -257,7 +257,7 @@ json { "message": "Expense updated successfully" }
 - **Response**:
 json { "message": "Expense deleted successfully" }
 
-### Get Category
+### 19. Get Category
 
 - **URL**: `/category`
 - **Method**: `GET`
@@ -266,7 +266,7 @@ json { "message": "Expense deleted successfully" }
 - **Response**:
 json [ { "category_id": "category_id_value", "name": "Food", "transaction_type": "expense" } ]
 
-### Post Category
+### 20. Post Category
 
 - **URL**: `/category`
 - **Method**: `POST`
@@ -282,7 +282,7 @@ json [ { "category_id": "category_id_value", "name": "Food", "transaction_type":
 - **Response**:
 json { "message": "Category created successfully", "category_id": "category_id_value" }
 
-### Update Category
+### 21. Update Category
 
 - **URL**: `/category/:category_id`
 - **Method**: `PUT`
@@ -297,7 +297,7 @@ json { "message": "Category created successfully", "category_id": "category_id_v
 - **Response**:
 json { "message": "Category updated successfully" }
 
-### Delete Category
+### 22. Delete Category
 
 - **URL**: `/category/:category_id`
 - **Method**: `DELETE`
@@ -306,7 +306,7 @@ json { "message": "Category updated successfully" }
 - **Response**:
 json { "message": "Category deleted successfully" }
 
-### Post Income
+### 23. Post Income
 
 - **URL**: `/income`
 - **Method**: `POST`
@@ -324,7 +324,7 @@ json { "message": "Category deleted successfully" }
 - **Response**:
 json { "message": "Income created successfully", "income_id": "income_id_value" }
 
-### Get Income
+### 24. Get Income
 
 - **URL**: `/income/:user_id`
 - **Method**: `GET`
@@ -333,7 +333,7 @@ json { "message": "Income created successfully", "income_id": "income_id_value" 
 - **Response**:
 json [ { "income_id": "income_id_value", "user_id": "user_id_value", "income_amount": 1000000, "income_date": "2024-12-01", "description": "Salary" } ]
 
-### Update Income
+### 25. Update Income
 
 - **URL**: `/income/:income_id`
 - **Method**: `PUT`
@@ -350,7 +350,7 @@ json [ { "income_id": "income_id_value", "user_id": "user_id_value", "income_amo
 - **Response**:
 json { "message": "Income updated successfully" }
 
-### Delete Income
+### 26. Delete Income
 
 - **URL**: `/income/:income_id`
 - **Method**: `DELETE`
@@ -359,7 +359,7 @@ json { "message": "Income updated successfully" }
 - **Response**:
 json { "message": "Income deleted successfully" }
 
-### Get Report Analysis
+### 27. Get Report Analysis
 
 - **URL**: `/report-analysis`
 - **Method**: `GET`
@@ -370,28 +370,28 @@ json { "message": "Income deleted successfully" }
 - **Response**:
 json { "totalIncome": 1000000, "totalExpense": 50000, "netBalance": 950000, "incomePercentage": "95.00", "expensePercentage": "5.00", "categories": [ { "name": "Food", "total_expense": 50000 } ] }
 
-### Post Financial Goals
+### 28. Post Financial Goals
 
 - **URL**: `/financial-goals`
 - **Method**: `POST`
 - **Response**:
 json { "message": "Saving goals created successfully", "goal_id": "goal_id_value" }
 
-### Get Financial Goals
+### 29. Get Financial Goals
 
 - **URL**: `/financial-goals/:user_id/:goal_id`
 - **Method**: `GET`
 - **Response**:
 json { "goal_id": "goal_id_value", "user_id": "user_id_value", "goal_name": "Save for Vacation", "target_amount": 2000000, "current_amount": 500000, "start_date": "2024-01-01", "goal_deadline": "2024-12-31" }
 
-### Update Financial Goals
+### 30. Update Financial Goals
 
 - **URL**: `/financial-goals/:user_id/:goal_id`
 - **Method**: `PUT`
 - **Response**:
 json { "message": "Goal updated successfully" }
 
-### Delete Financial Goals
+### 31. Delete Financial Goals
 
 - **URL**: `/financial-goals/:user_id/:goal_id`
 - **Method**: `DELETE`
