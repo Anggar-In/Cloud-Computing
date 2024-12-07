@@ -15,6 +15,8 @@ Sebelum memulai, pastikan telah menginstal :
 5. npm install uuid
 6. npm install tesseract.js
 7. npm install multer
+8. npm install nodemailer
+9. npm install swagger-ui-express js-yaml
 
 ## Set Up To Test API
 
