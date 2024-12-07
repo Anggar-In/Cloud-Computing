@@ -26,6 +26,12 @@ Sebelum memulai, pastikan telah menginstal :
   - `name` as string
   - `email` as string, must be unique
   - `password` as string, must be at least 8 characters
+```
+{
+  "message": "Registration successful, OTP sent to email"
+}
+
+```
 - **Response**:
 json { "error": false, "message": "Registration successful, OTP sent to email" }
 
