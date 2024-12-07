@@ -4,6 +4,32 @@ const { v4: uuidv4 } = require('uuid');
 const connectDB = require('./connect');
 const { SECRET_KEY } = require('./config');
 const { processImage } = require('../machine_learning/OCR_Receipt');
+const SpeechToTextExtractor = require('../machine_learning/voiceInput');
+const nodemailer = require('nodemailer');
+
+const sendOTP = async (email, otp) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'anggarinteam@gmail.com', 
+      pass: 'timanggarin' 
+    }
+  });
+
+  const mailOptions = {
+    from: 'anggarinteam@gmail.com',
+    to: email,
+    subject: 'Your OTP Code',
+    html: `<p>Your OTP code is: <strong>${otp}</strong></p>` 
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error sending OTP email:", error);
+    throw new Error("Failed to send OTP email");
+  }
+};
 
 // Register API
 const register = async (req, res) => {
@@ -22,9 +48,30 @@ const register = async (req, res) => {
     const values = [userId, name, email, hashedPassword];
 
     await db.query(query, values);
-    res.status(200).json({ message: "Registration successful" });
+
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    await sendOTP(email, otp);
+
+    await db.query("INSERT INTO otp_verification (user_id, otp) VALUES (?, ?)", [userId, otp]);
+
+    res.status(200).json({ message: "Registration successful, OTP sent to email" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+const verifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+
+  const db = await connectDB();
+  const [results] = await db.query("SELECT * FROM otp_verification WHERE otp = ? AND user_id = (SELECT user_id FROM users WHERE email = ?)", [otp, email]);
+
+  if (results.length > 0) {
+    await db.query("UPDATE users SET is_verified = 1 WHERE email = ?", [email]);
+    await db.query("DELETE FROM otp_verification WHERE user_id = (SELECT user_id FROM users WHERE email = ?)", [email]); // Remove OTP after verification
+    res.status(200).json({ message: "OTP verified successfully" });
+  } else {
+    res.status(400).json({ message: "Invalid OTP" });
   }
 };
 
@@ -142,13 +189,15 @@ const postReceipt = async (req, res) => {
   }
 };
 
-const voiceInput = async (req, res) => {
+// POST VOICE INPUT API
+const postVoiceInput = async (req, res) => {
   try {
-    const { transactionType, extractedData } = req.body;
+    const { transactionType, fullTranscriptText } = req.body;
     const user_id = req.user_id; 
     const db = await connectDB();
     const category_id = req.headers['category_id']; 
-
+    const extractor = new SpeechToTextExtractor();
+    const extractedData = extractor.extractData(fullTranscriptText);
     const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
     if (categoryCheck.length === 0) {
       return res.status(400).json({ message: 'Invalid category ID' });
@@ -156,19 +205,21 @@ const voiceInput = async (req, res) => {
 
     if (transactionType === 'expense') {
       const expense_id = uuidv4();
-      const { total, date, items, company } = extractedData;
+      const { Total, Date, Items, Company } = extractedData;
 
       const query = `INSERT INTO expense (Expense_ID, User_ID, Category_ID, Expense_amount, Expense_date, store, items) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-      const values = [expense_id, user_id, category_id, total, date, company, JSON.stringify(items)];
+      const values = [expense_id, user_id, category_id, Total, Date, Company, JSON.stringify(Items)];
 
       await db.query(query, values);
       res.status(201).json({ message: 'Expense recorded successfully', expense_id });
-    } else if (transactionType === 'income') {
+    } 
+
+    else if (transactionType === 'income') {
       const income_id = uuidv4();
-      const { total, date, company } = extractedData;
+      const { Total, Date, Company } = extractedData;
 
       const query = `INSERT INTO income (income_id, user_id, category_id, income_amount, income_date, description) VALUES (?, ?, ?, ?, ?, ?)`;
-      const values = [income_id, user_id, category_id, total, date, company];
+      const values = [income_id, user_id, category_id, Total, Date, Company];
 
       await db.query(query, values);
       res.status(201).json({ message: 'Income recorded successfully', income_id });
@@ -730,10 +781,11 @@ module.exports = { register,
   deleteIncome, 
   putUserProfile, 
   getUserProfile, 
-  voiceInput, 
   getReportAnalysis, 
   getUsers, 
   createFinanGoals, 
   getFinanGoals, 
   updateFinanGoals, 
-  deleteFinanGoals };
+  deleteFinanGoals, 
+  postVoiceInput, 
+  verifyOTP };
