@@ -1,4 +1,4 @@
-## Prasyarat
+![image](https://github.com/user-attachments/assets/b35b48d5-c74b-41c0-87aa-73569fd6695f)## Prasyarat
 
 Sebelum memulai, pastikan telah menginstal :
 
@@ -128,6 +128,12 @@ json { "fullname": "user_name", "date_of_birth": "YYYY-MM-DD", "phone_number": "
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
   - `category_id`: `your_category_id`
+- **Request Body**:
+```
+{
+  "fullTranscriptText": "Pengeluaran untuk belanja adalah 100 ribu"
+}
+```
 - **Response**:
 json { "error": false, "message": "Income recorded successfully", "income_id": "income_id_value" }
 
@@ -149,6 +155,13 @@ json { "message": "Receipt scanned and expense recorded successfully", "expense_
 - **Method**: `POST`
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
+- **Request Body**:
+```
+{
+  "income_month": 5000,
+  "budget_month": 3000
+}
+```
 - **Response**:
 json { "message": "Budget created successfully", "budget_id": "budget_id_value" }
 
@@ -167,6 +180,13 @@ json [ { "budget_id": "budget_id_value", "user_id": "user_id_value", "income_mon
 - **Method**: `PUT`
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
+- **Request Body**:
+```
+{
+  "income_month": 6000,
+  "budget_month": 3500
+}
+```
 - **Response**:
 json { "message": "Budget updated successfully" }
 
@@ -186,6 +206,15 @@ json { "message": "Budget deleted successfully" }
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
   - `category_id`: `your_category_id`
+- **Request Body**:
+```
+{
+  "expense_amount": 100,
+  "expense_date": "2024-12-07",
+  "store": "Grocery Store",
+  "items": ["Milk", "Bread"]
+}
+```
 - **Response**:
 json { "message": "Expense created successfully", "expense_id": "expense_id_value" }
 
@@ -207,6 +236,15 @@ json [ { "Expense_ID": "expense_id_value", "User_ID": "user_id_value", "Expense_
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
   - `category_id`: `1`
+- **Request Body**:
+```
+{
+  "expense_amount": 150,
+  "expense_date": "2024-12-08",
+  "store": "Supermarket",
+  "items": ["Eggs", "Cheese"]
+}
+```
 - **Response**:
 json { "message": "Expense updated successfully" }
 
@@ -234,6 +272,13 @@ json [ { "category_id": "category_id_value", "name": "Food", "transaction_type":
 - **Method**: `POST`
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
+- **Request Body**:
+```
+{
+  "name": "Food",
+  "transaction_type": "expense"
+}
+```
 - **Response**:
 json { "message": "Category created successfully", "category_id": "category_id_value" }
 
@@ -243,6 +288,12 @@ json { "message": "Category created successfully", "category_id": "category_id_v
 - **Method**: `PUT`
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
+- **Request Body**:
+```
+{
+  "name": "Food"
+}
+```
 - **Response**:
 json { "message": "Category updated successfully" }
 
@@ -262,6 +313,14 @@ json { "message": "Category deleted successfully" }
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
   - `category_id`: `2`
+- **Request Body**:
+```
+{
+  "income_amount": 2000,
+  "income_date": "2024-12-07",
+  "description": "Salary"
+}
+```
 - **Response**:
 json { "message": "Income created successfully", "income_id": "income_id_value" }
 
@@ -281,6 +340,13 @@ json [ { "income_id": "income_id_value", "user_id": "user_id_value", "income_amo
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
   - `category_id`: `2`
+```
+{
+  "income_amount": 2000,
+  "income_date": "2024-12-07",
+  "description": "Salary"
+}
+```
 - **Response**:
 json { "message": "Income updated successfully" }
 
