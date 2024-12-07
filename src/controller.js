@@ -788,4 +788,8 @@ module.exports = { register,
   updateFinanGoals, 
   deleteFinanGoals, 
   postVoiceInput, 
+<<<<<<< HEAD
   verifyOTP };
+=======
+  verifyOTP };
+>>>>>>> 3ac12cd4eb0066f188561a68336e695822eea286

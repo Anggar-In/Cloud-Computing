@@ -16,9 +16,12 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.4",
+<<<<<<< HEAD
     "nodemailer": "^6.9.16",
     "readline-sync": "^1.4.10",
     "speech-to-text": "^2.9.1",
+=======
+>>>>>>> 3ac12cd4eb0066f188561a68336e695822eea286
     "tesseract.js": "^5.1.1",
     "uuid": "^11.0.3"
   },

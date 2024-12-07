@@ -1,0 +1,4 @@
+.env
+anggarin_db.sql
+anggarin_db.json
+node_modules/
