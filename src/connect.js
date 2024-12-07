@@ -8,16 +8,10 @@ async function connectDB() {
       user: DB_USER,
       password: DB_PASSWORD,
       database: DB_NAME,
-<<<<<<< HEAD
     });
 
     console.log("Connected to MySQL database");
 
-=======
-      port: 3306,
-    });
-    console.log("Connected to MySQL database");
->>>>>>> 3ac12cd4eb0066f188561a68336e695822eea286
     return db; 
   } catch (err) {
     console.error("Error connecting to the database:", err);
