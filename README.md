@@ -18,17 +18,13 @@ Sebelum memulai, pastikan telah menginstal :
 
 ## Set Up To Test API
 
-## User Registration
-URL: /auth/register
-Method: POST
-Request Body:
-name as string
-email as string, must be unique
-password as string, must be at least 8 characters
-Response:
-json
+### User Registration
 
-`{
-  "error": false,
-  "message": "Registration successful, OTP sent to email"
-}`
+- **URL**: `/auth/register`
+- **Method**: `POST`
+- **Request Body**:
+  - `name` as string
+  - `email` as string, must be unique
+  - `password` as string, must be at least 8 characters
+- **Response**:
+json { "error": false, "message": "Registration successful, OTP sent to email" }
