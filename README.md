@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/b35b48d5-c74b-41c0-87aa-73569fd6695f)## Prasyarat
+## Prasyarat
 
 Sebelum memulai, pastikan telah menginstal :
 
