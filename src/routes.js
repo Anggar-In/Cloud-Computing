@@ -77,8 +77,4 @@ router.get("/financial-goals/:user_id/:goal_id", getFinanGoals);
 router.put("/financial-goals/:user_id/:goal_id", updateFinanGoals);
 router.delete("/financial-goals/:user_id/:goal_id", deleteFinanGoals);
 
-<<<<<<< HEAD
 module.exports = router;
-=======
-module.exports = router;
->>>>>>> 3ac12cd4eb0066f188561a68336e695822eea286
