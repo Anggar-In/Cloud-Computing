@@ -141,7 +141,7 @@ json { "fullname": "user_name", "date_of_birth": "YYYY-MM-DD", "phone_number": "
 - **Request Body**:
 ```
 {
-  "fullTranscriptText": "Pengeluaran untuk belanja adalah 100 ribu"
+  "fullTranscriptText": "ulhaq 100 hari yang lalu membeli apel afrika, kebun tebu, dan segalon air di juragan empang dengan total 5 miliar rupiah"
 }
 ```
 - **Response**:
