@@ -823,6 +823,20 @@ const deleteFinanGoals = async (req, res) => {
   }
 };
 
+const getCompanyInfo = async (req, res) => {
+  try {
+    const { kode_saham } = req.params;
+    const db = await connectDB();
+
+    const query = "SELECT * FROM company_invest WHERE kode_saham = ?";
+    const [results] = await db.query(query, [kode_saham]);
+
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: "Database error", error: error.message });
+  }
+};
+
 
 module.exports = { register, 
   login, 
@@ -854,4 +868,5 @@ module.exports = { register,
   deleteFinanGoals, 
   postVoiceInput, 
   verifyOTP,
-  resendOTP };
+  resendOTP,
+  getCompanyInfo};
