@@ -36,8 +36,9 @@ const {
   updateFinanGoals,
   deleteFinanGoals,
   verifyOTP, 
-  resendOTP,
-  getCompanyInfo} = require('./controller');
+  resendOTP} = require('./controller');
+
+  const { calculatorFreedom } = require('./stockRecommendation');
 
 router.post('/auth/register', register);
 router.post('/auth/login', login);
@@ -80,6 +81,6 @@ router.get("/financial-goals/:user_id/:goal_id", getFinanGoals);
 router.put("/financial-goals/:user_id/:goal_id", updateFinanGoals);
 router.delete("/financial-goals/:user_id/:goal_id", deleteFinanGoals);
 
-router.get("/companyInfo/:kode_saham", getCompanyInfo);
+router.post('/calculate-roi', auth, calculatorFreedom);
 
 module.exports = router;
