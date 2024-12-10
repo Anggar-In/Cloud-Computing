@@ -151,12 +151,18 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign({ user_ID: user.user_ID }, SECRET_KEY, { expiresIn: '1h' });
-    res.status(200).json({ message: "Login berhasil", token });
+    res.status(200).json({
+      message: "Login berhasil",
+      token,
+      user: {
+        name: user.name,
+        email: user.email
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: "Terjadi kesalahan server", error: error.message });
   }
 };
-
 
 //GET users
 const getUsers = async (req, res) => {
