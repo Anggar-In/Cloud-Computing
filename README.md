@@ -19,7 +19,7 @@ ANGGAR.IN CLOUD COMPUTING DOCUMENTATION
 
 ### These Are Our Team Members in the Cloud Computing Division:
 
-* (CC) C214B4KY2719 - Muhammad Alvanditya Sasongko - Universitas Sebelas Maret
+* (CC) C214B4KY2719 - Muhammad Alvanditya Sasongko - Universitas Islam Indonesia
 * (CC) C312B4KY4470 - Whilyan Pratama - Universitas Sebelas Maret
 
 ### Roles
@@ -476,6 +476,102 @@ json { "message": "Goal updated successfully" }
 - **Method**: `DELETE`
 - **Response**:
 json { "message": "Goal deleted successfully" }
+
+### 31. Delete Financial Goals
+
+- **URL**: `/financial-goals/:user_id/:goal_id`
+- **Method**: `DELETE`
+- **Response**:
+json { "message": "Goal deleted successfully" }
+
+### 32. Investment Calculator Input
+
+- **URL**: `https://ml-api-1067208185659.asia-southeast2.run.app/calculate-target-return`
+- **Method**: `POST`
+```
+{
+  "annualExpenditure": 50000000, 
+    "initialInvestment": 100000000, 
+    "timePeriod": 10
+}
+```
+- **Response**:
+```
+{
+    "targetPortfolio": "1250000000.00",
+    "roi": "28.73%",
+    "targetReturn": 28.733329354522397
+}
+```
+
+### 33. Investment Recomendation
+
+- **URL**: `https://ml-api-1067208185659.asia-southeast2.run.app/recommendations`
+- **Method**: `POST`
+```
+{
+  "targetReturn": 28.733329354522397
+}
+```
+- **Response**:
+```
+    {
+        "stockCode": "LSIP",
+        "revenue": "Rp 4.191.000.000.000",
+        "netIncome": "Rp 1.108.000.000.000",
+        "marketCap": "Rp 8.082.000.000.000",
+        "annualEPS": 157.06,
+        "returnOnEquity": 9.32,
+        "oneYearPriceReturns": 30.22,
+        "threeYearPriceReturns": 0.85,
+        "fiveYearPriceReturns": -12.87,
+        "dividendYield": 3.29,
+        "payoutRatio": 24.83
+    },
+    {
+        "stockCode": "UNTR",
+        "revenue": "Rp 130.544.000.000.000",
+        "netIncome": "Rp 20.855.000.000.000",
+        "marketCap": "Rp 103.045.000.000.000",
+        "annualEPS": 5573.22,
+        "returnOnEquity": 24.35,
+        "oneYearPriceReturns": 23.19,
+        "threeYearPriceReturns": 21.7,
+        "fiveYearPriceReturns": 33.45,
+        "dividendYield": 8.09,
+        "payoutRatio": 40.12
+    }
+```
+
+### 34. Investment Prediction
+
+- **URL**: `https://anggarin-api-invest-service-1067208185659.asia-southeast2.run.app/result/<nama>`
+- **URL example**: `https://anggarin-api-invest-service-1067208185659.asia-southeast2.run.app/result/ADMF_A96_M165_forecast.csv`
+- **Method**: `GET`
+
+- **Response**:
+```
+{
+    {
+        "timestamp": "2024-12-07",
+        "low": "10061",
+        "high": "10203",
+        "close": "10144"
+    },
+    {
+        "timestamp": "2024-12-08",
+        "low": "10057",
+        "high": "10199",
+        "close": "10140"
+    },
+    {
+        "timestamp": "2024-12-09",
+        "low": "10051",
+        "high": "10193",
+        "close": "10134"
+    },
+}
+```
 
 
 # Other Path Documentation 
