@@ -25,10 +25,12 @@ ANGGAR.IN CLOUD COMPUTING DOCUMENTATION
 ### Roles
 
 >>> EDIT ROLE DIBAWAH DENGAN FORMAT YANG SAMA
-* Role - Nama (ID Bangkit)
+* Configuration API using google cloud - Muhammad Alvanditya Sasongko (C214B4KY2719)
+* Deployment ML model for Investment calculator using google storage - Muhammad Alvanditya Sasongko (C214B4KY2719)
+* Create API for investment calculator - Muhammad Alvanditya Sasongko (C214B4KY2719)
+* Create API for Investment recomendation - Muhammad Alvanditya Sasongko (C214B4KY2719)
+* Create API for Investment prediction - Muhammad Alvanditya Sasongko (C214B4KY2719)
 
-Contoh:
-* Audio Recognition (Income and Expense Tracking) - Muhamad Faqih Zacky (M312B4KY2631)
 
 # Anggar.In Cloud Computing Project Explanation
 This project is our final project for Google Bangkit Academy 2024 Batch 2.
