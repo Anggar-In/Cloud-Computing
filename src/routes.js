@@ -36,8 +36,7 @@ const {
   updateFinanGoals,
   deleteFinanGoals,
   verifyOTP, 
-  resendOTP,
-  getCompanyInfo} = require('./controller');
+  resendOTP, checkTokenBlacklist} = require('./controller');
 
   const { calculatorFreedom } = require('./stockRecommendation');
 
@@ -48,42 +47,40 @@ router.get("/:user_id", getUsers);
 router.post('/auth/verify-otp', verifyOTP); 
 router.post('/resend-otp', resendOTP);
 
-router.post('/upload-receipt', auth, upload.single('receipt'), postReceipt);
+router.post('/upload-receipt', auth, checkTokenBlacklist, upload.single('receipt'), postReceipt);
 
-router.post('/budget', auth, postBudget);
-router.get('/budget/:user_id', auth, getBudget);
-router.put('/budget/:budget_id', auth, putBudget);
-router.delete('/budget/:budget_id', auth, deleteBudget);
+router.post('/budget', auth, checkTokenBlacklist, postBudget);
+router.get('/budget/:user_id', auth, checkTokenBlacklist, getBudget);
+router.put('/budget/:budget_id', auth, checkTokenBlacklist, putBudget);
+router.delete('/budget/:budget_id', auth, checkTokenBlacklist, deleteBudget);
 
-router.post('/expense', auth, postExpense);
-router.get('/expense/:user_id', auth, getExpense);
-router.put('/expense/:expense_id', auth, putExpense);
-router.delete('/expense/:expense_id', auth, deleteExpense);
+router.post('/expense', auth, checkTokenBlacklist, postExpense);
+router.get('/expense/:user_id', auth, checkTokenBlacklist, getExpense);
+router.put('/expense/:expense_id', auth, checkTokenBlacklist, putExpense);
+router.delete('/expense/:expense_id', auth, checkTokenBlacklist, deleteExpense);
 
-router.get('/category', auth, getCategory);
-router.post('/category', auth, postCategory);
-router.put('/category/:category_id', auth, putCategory);
-router.delete('/category/:category_id', auth, deleteCategory);
+router.get('/category', auth, checkTokenBlacklist, getCategory);
+router.post('/category', auth, checkTokenBlacklist, postCategory);
+router.put('/category/:category_id', auth, checkTokenBlacklist, putCategory);
+router.delete('/category/:category_id', auth, checkTokenBlacklist, deleteCategory);
 
-router.post('/income', auth, postIncome);
-router.get('/income/:user_id', auth, getIncome);
-router.put('/income/:income_id', auth, putIncome);
-router.delete('/income/:income_id', auth, deleteIncome);
+router.post('/income', auth, checkTokenBlacklist, postIncome);
+router.get('/income/:user_id', auth, checkTokenBlacklist, getIncome);
+router.put('/income/:income_id', auth, checkTokenBlacklist, putIncome);
+router.delete('/income/:income_id', auth, checkTokenBlacklist, deleteIncome);
 
-router.get('/user/profile', auth, getUserProfile);
-router.put('/user/profile', auth, putUserProfile);
+router.get('/user/profile', auth, checkTokenBlacklist, getUserProfile);
+router.put('/user/profile', auth, checkTokenBlacklist, putUserProfile);
 
-router.post('/voice-input', auth, postVoiceInput);
+router.post('/voice-input', auth, checkTokenBlacklist, postVoiceInput);
 
-router.get('/report-analysis', auth, getReportAnalysis);
+router.get('/report-analysis', auth, checkTokenBlacklist, getReportAnalysis);
 
-router.post("/financial-goals", createFinanGoals);
-router.get("/financial-goals/:user_id/:goal_id", getFinanGoals);
-router.put("/financial-goals/:user_id/:goal_id", updateFinanGoals);
-router.delete("/financial-goals/:user_id/:goal_id", deleteFinanGoals);
+router.post("/financial-goals", auth, checkTokenBlacklist, createFinanGoals);
+router.get("/financial-goals/:goal_id", auth, checkTokenBlacklist, getFinanGoals);
+router.put("/financial-goals/:goal_id", auth, checkTokenBlacklist, updateFinanGoals);
+router.delete("/financial-goals/:goal_id", auth, checkTokenBlacklist, deleteFinanGoals);
 
-router.get("/companyInfo/:kode_saham", getCompanyInfo);
-
-router.post('/calculate-roi', auth, calculatorFreedom);
+router.post('/calculate-roi', auth, checkTokenBlacklist, calculatorFreedom);
 
 module.exports = router;
