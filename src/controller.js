@@ -7,6 +7,7 @@ const { processImage } = require('../machine_learning/OCR_Receipt');
 const SpeechToTextExtractor = require('../machine_learning/voiceInput');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
+const tokenBlacklist = new Set();
 
 const sendOTP = async (email, otp) => {
   const transporter = nodemailer.createTransport({
@@ -150,7 +151,12 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Password salah" });
     }
 
-    const token = jwt.sign({ user_ID: user.user_ID }, SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ user_ID: user.user_ID }, SECRET_KEY);
+
+    if (tokenBlacklist.has(token)) {
+      return res.status(401).json({ message: "Token telah dibatalkan. Silakan login kembali." });
+    }
+
     res.status(200).json({
       message: "Login berhasil",
       token,
@@ -164,6 +170,34 @@ const login = async (req, res) => {
   }
 };
 
+// LOGOUT API
+const logout = async (req, res) => {
+  try {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+      return res.status(400).json({ message: "Token tidak ditemukan" });
+    }
+    
+    tokenBlacklist.add(token);
+
+    res.status(200).json({ message: "Logout berhasil" });
+  } catch (error) {
+    res.status(500).json({ message: "Terjadi kesalahan saat logout", error: error.message });
+  }
+};
+
+
+const checkTokenBlacklist = (req, res, next) => {
+
+  const token = req.headers['authorization']?.split(' ')[1];
+
+  if (token && tokenBlacklist.has(token)) {
+    return res.status(401).json({ message: "Token telah dibatalkan. Silakan login kembali." });
+  }
+
+  next();
+};
+
 //GET users
 const getUsers = async (req, res) => {
   const { user_id } = req.params;
@@ -173,12 +207,6 @@ const getUsers = async (req, res) => {
     if (err) return res.status(500).json({ message: "Database error", error: err });
     res.status(200).json({ transactions: results });
   });
-};
-
-
-const logout = (req, res) => {
-
-  res.status(200).json({ message: "Logout successful" });
 };
 
 const getUserProfile = async (req, res) => {
@@ -758,10 +786,11 @@ const getReportAnalysis = async (req, res) => {
   }
 };
 
-//POST FINANCIAL GOALS API
+// POST FINANCIAL GOALS API
 const createFinanGoals = async (req, res) => {
   try {
-    const { user_id, goal_name, target_amount, current_amount, start_date, goal_deadline } = req.body;
+    const { goal_name, target_amount, current_amount, start_date, goal_deadline } = req.body;
+    const user_id = req.user_id; 
     const goal_id = uuidv4();
     const db = await connectDB();
 
@@ -775,30 +804,36 @@ const createFinanGoals = async (req, res) => {
   }
 };
 
-//GET FINANCIAL GOALS API
+// GET FINANCIAL GOALS API
 const getFinanGoals = async (req, res) => {
   try {
-    const { goal_id, user_id } = req.params;
+    const { goal_id } = req.params;
+    const user_id = req.user_id;
     const db = await connectDB();
 
     const query = "SELECT * FROM saving_financial_goals WHERE goal_id = ? AND user_id = ?";
     const [results] = await db.query(query, [goal_id, user_id]);
 
-    res.status(200).json(results);
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Goal not found" });
+    }
+
+    res.status(200).json(results[0]);
   } catch (error) {
     res.status(500).json({ message: "Database error", error: error.message });
   }
 };
 
-//PUT FINANCIAL GOALS API
+// PUT FINANCIAL GOALS API
 const updateFinanGoals = async (req, res) => {
   try {
-    const { goal_id } = req.params;
+    const { goal_id } = req.params; 
     const { goal_name, target_amount, current_amount, start_date, goal_deadline } = req.body;
+    const user_id = req.user_id; 
     const db = await connectDB();
 
-    const query = "UPDATE saving_financial_goals SET goal_name = ?, target_amount = ?, current_amount = ?, start_date = ?, goal_deadline = ? WHERE goal_id = ?";
-    const values = [goal_name, target_amount, current_amount, start_date, goal_deadline, goal_id];
+    const query = "UPDATE saving_financial_goals SET goal_name = ?, target_amount = ?, current_amount = ?, start_date = ?, goal_deadline = ? WHERE goal_id = ? AND user_id = ?";
+    const values = [goal_name, target_amount, current_amount, start_date, goal_deadline, goal_id, user_id];
 
     const [result] = await db.query(query, values);
     if (result.affectedRows === 0) {
@@ -811,14 +846,15 @@ const updateFinanGoals = async (req, res) => {
   }
 };
 
-//DELETE FINANCIAL GOALS API
+// DELETE FINANCIAL GOALS API
 const deleteFinanGoals = async (req, res) => {
   try {
     const { goal_id } = req.params;
+    const user_id = req.user_id; 
     const db = await connectDB();
 
-    const query = "DELETE FROM saving_financial_goals WHERE goal_id = ?";
-    const [result] = await db.query(query, [goal_id]);
+    const query = "DELETE FROM saving_financial_goals WHERE goal_id = ? AND user_id = ?";
+    const [result] = await db.query(query, [goal_id, user_id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Goal not found" });
     }
@@ -828,21 +864,6 @@ const deleteFinanGoals = async (req, res) => {
     res.status(500).json({ message: "Database error", error: error.message });
   }
 };
-
-const getCompanyInfo = async (req, res) => {
-  try {
-    const { kode_saham } = req.params;
-    const db = await connectDB();
-
-    const query = "SELECT * FROM company_invest WHERE kode_saham = ?";
-    const [results] = await db.query(query, [kode_saham]);
-
-    res.status(200).json(results);
-  } catch (error) {
-    res.status(500).json({ message: "Database error", error: error.message });
-  }
-};
-
 
 module.exports = { register, 
   login, 
@@ -874,5 +895,4 @@ module.exports = { register,
   deleteFinanGoals, 
   postVoiceInput, 
   verifyOTP,
-  resendOTP,
-  getCompanyInfo};
+  resendOTP, checkTokenBlacklist };
