@@ -8,6 +8,7 @@ const SpeechToTextExtractor = require('../machine_learning/voiceInput');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 const tokenBlacklist = new Set();
+const tokenBeforeExpired = new Map();
 
 const sendOTP = async (email, otp) => {
   const transporter = nodemailer.createTransport({
@@ -178,7 +179,8 @@ const logout = async (req, res) => {
       return res.status(400).json({ message: "Token tidak ditemukan" });
     }
     
-    tokenBlacklist.add(token);
+    const expirationTime = Date.now() + 10 * 60 * 1000; 
+    tokenBeforeExpired.set(token, expirationTime);
 
     res.status(200).json({ message: "Logout berhasil" });
   } catch (error) {
@@ -186,13 +188,18 @@ const logout = async (req, res) => {
   }
 };
 
-
 const checkTokenBlacklist = (req, res, next) => {
-
   const token = req.headers['authorization']?.split(' ')[1];
 
-  if (token && tokenBlacklist.has(token)) {
-    return res.status(401).json({ message: "Token telah dibatalkan. Silakan login kembali." });
+  if (token) {
+    const expirationTime = tokenBeforeExpired.get(token);
+    if (expirationTime) {
+      if (Date.now() > expirationTime) {
+        tokenBeforeExpired.delete(token);
+      } else {
+        return res.status(401).json({ message: "Token telah dibatalkan. Silakan login kembali." });
+      }
+    }
   }
 
   next();
