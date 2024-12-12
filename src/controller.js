@@ -7,8 +7,7 @@ const { processImage } = require('../machine_learning/OCR_Receipt');
 const SpeechToTextExtractor = require('../machine_learning/voiceInput');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-const tokenBlacklist = new Set();
-const tokenBeforeExpired = new Map();
+
 
 const sendOTP = async (email, otp) => {
   const transporter = nodemailer.createTransport({
@@ -152,11 +151,7 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Password salah" });
     }
 
-    const token = jwt.sign({ user_ID: user.user_ID }, SECRET_KEY);
-
-    if (tokenBlacklist.has(token)) {
-      return res.status(401).json({ message: "Token telah dibatalkan. Silakan login kembali." });
-    }
+    const token = jwt.sign({ user_ID: user.user_ID }, SECRET_KEY, { expiresIn: '2h' });
 
     res.status(200).json({
       message: "Login berhasil",
@@ -173,37 +168,9 @@ const login = async (req, res) => {
 
 // LOGOUT API
 const logout = async (req, res) => {
-  try {
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-      return res.status(400).json({ message: "Token tidak ditemukan" });
-    }
-    
-    const expirationTime = Date.now() + 10 * 60 * 1000; 
-    tokenBeforeExpired.set(token, expirationTime);
-
-    res.status(200).json({ message: "Logout berhasil" });
-  } catch (error) {
-    res.status(500).json({ message: "Terjadi kesalahan saat logout", error: error.message });
-  }
+  res.status(200).json({ message: "Logout berhasil" });
 };
 
-const checkTokenBlacklist = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-
-  if (token) {
-    const expirationTime = tokenBeforeExpired.get(token);
-    if (expirationTime) {
-      if (Date.now() > expirationTime) {
-        tokenBeforeExpired.delete(token);
-      } else {
-        return res.status(401).json({ message: "Token telah dibatalkan. Silakan login kembali." });
-      }
-    }
-  }
-
-  next();
-};
 
 //GET users
 const getUsers = async (req, res) => {
@@ -902,4 +869,4 @@ module.exports = { register,
   deleteFinanGoals, 
   postVoiceInput, 
   verifyOTP,
-  resendOTP, checkTokenBlacklist };
+  resendOTP };
