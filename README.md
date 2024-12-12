@@ -72,9 +72,7 @@ Leveraging machine learning, cloud computing, and mobile technology, Anggar.In a
 
 **Cloud Computing:** 
 
->>EDIT TEKS DIBAWAH INI DENGAN BACKGROUNDER CLOUD COMPUTING DI PROJECT BRIEF
-
-In the Machine Learning path, we developed several features, starting with our MVP [stock prediction](https://github.com/Anggar-In/Machine-Learning/tree/main/stock_price_predictions) and [recommendation models](https://github.com/Anggar-In/Machine-Learning/tree/main/stockRecommendation)  for a financial freedom calculator. These models utilize TensorFlow, are saved using TensorFlow.js for web deployment, preprocess data using Min-Max Scaler for normalization, and apply time series forecasting for stock price prediction alongside linear regression for stock recommendations. Beyond the MVP, we also building supplementary features beyond the MVP, such as [Receipt OCR](https://github.com/Anggar-In/Machine-Learning/tree/main/Receipt_OCR) and [Audio Recognition](https://github.com/Anggar-In/Machine-Learning/tree/main/AudioRecognition). The Receipt OCR leverages the Pytesseract library for extracting text from images, while the Audio Recognition feature utilizes the WebSpeech API. Both systems are tuned with preprocessing techniques for image or audio and use regex for data extraction. This feature is useful for automating expense and income tracking.
+In this capstone project, the cloud computing division plans to create a backend and cloud computing design using Node.js as API and Google Cloud to deploy the API and database. We initially planned to use cloud storage to store OCR results, cloud functions to run the API, Firestore as a NoSQL database, Compute Engine for ML computing, Cloud IAM to set up access to Google Cloud, Vertex AI to deploy and train ML, and the Google Cloud pricing calculator to estimate project costs. However, in the implementation, we didn't use everything as planned because using some services was sufficient.
 
 # How to Use The Code
 ## Requirements
