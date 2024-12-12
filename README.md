@@ -512,7 +512,7 @@ json { "message": "Goal deleted successfully" }
 - **Method**: `POST`
 ```
 {
-  "ROI": 28.73
+  "targetReturn": 28.73
 }
 ```
 - **Response**:
