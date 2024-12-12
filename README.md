@@ -501,7 +501,7 @@ json { "message": "Goal deleted successfully" }
 ```
 {
     "targetPortfolio": "1250000000.00",
-    "roi": "28.73%",
+    "roi": 28.73,
     "targetReturn": 28.733329354522397
 }
 ```
@@ -512,7 +512,7 @@ json { "message": "Goal deleted successfully" }
 - **Method**: `POST`
 ```
 {
-  "targetReturn": 28.733329354522397
+  "ROI": 28.73
 }
 ```
 - **Response**:
