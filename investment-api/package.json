@@ -1,0 +1,13 @@
+{
+    "name": "investment-api",
+    "version": "1.0.0",
+    "dependencies": {
+        "@google-cloud/functions-framework": "^3.0.0",
+        "@google-cloud/storage": "^6.6.0",
+        "csv-parser": "^3.0.0",
+        "express": "^4.18.2"
+    },
+    "scripts": {
+        "start": "node index.js"
+    }
+}
