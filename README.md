@@ -571,30 +571,32 @@ json { "message": "Goal deleted successfully" }
 
 ### 34. Investment Prediction
 
-- **URL**: `https://anggarin-api-invest-service-1067208185659.asia-southeast2.run.app/result/<nama>`
-- **URL example**: `https://anggarin-api-invest-service-1067208185659.asia-southeast2.run.app/result/ADMF_A96_M165_forecast.csv`
+- **URL**: `https://anggarin-api-invest-service-1067208185659.asia-southeast2.run.app/result/<stockcode>`
+- **URL example**: `https://anggarin-api-invest-service-1067208185659.asia-southeast2.run.app/result/ADMF`
 - **Method**: `GET`
 
 - **Response**:
 ```
-{
-    {
+ {
         "timestamp": "2024-12-07",
         "low": "10061",
         "high": "10203",
-        "close": "10144"
+        "close": "10144",
+        "stockcode": "ADMF"
     },
     {
         "timestamp": "2024-12-08",
         "low": "10057",
         "high": "10199",
-        "close": "10140"
+        "close": "10140",
+        "stockcode": "ADMF"
     },
     {
         "timestamp": "2024-12-09",
         "low": "10051",
         "high": "10193",
-        "close": "10134"
+        "close": "10134",
+        "stockcode": "ADMF"
     },
 }
 ```
