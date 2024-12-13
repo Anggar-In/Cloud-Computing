@@ -28,7 +28,7 @@ ANGGAR.IN CLOUD COMPUTING DOCUMENTATION
 * Create Verify OTP API - Whilyan Pratama (C312B4KY4470)
 * Create Resend OTP API - Whilyan Pratama (C312B4KY4470)
 * Create User Login API - Whilyan Pratama (C312B4KY4470)
-* Create Get User by ID API - Whilyan Pratama (C312B4KY4470)
+* Create User API - Whilyan Pratama (C312B4KY4470)
 * Create Logout API - Whilyan Pratama (C312B4KY4470)
 * Create User Profile API - Whilyan Pratama (C312B4KY4470)
 * Create Voice Input API - Whilyan Pratama (C312B4KY4470)
@@ -170,7 +170,7 @@ json
 }
 ```
 
-### 5. Get User by ID
+### 5. Get User
 
 - **URL**: `/:user_id`
 - **Method**: `GET`
