@@ -113,8 +113,12 @@ Before starting, make sure you have installed:
 }
 ```
 - **Response**:
-json { "error": false, "message": "Registration successful, OTP sent to email" }
-
+json
+```
+{
+"message": "Registration successful, OTP sent to email"
+}
+```
 ### 2. Verify OTP
 
 - **URL**: `/auth/verify-otp`
@@ -130,8 +134,12 @@ json { "error": false, "message": "Registration successful, OTP sent to email" }
 }
 ```
 - **Response**:
-json { "error": false, "message": "OTP verified successfully" }
-
+json
+```
+{
+"message": "OTP verified successfully"
+}
+```
 ### 3. Resend OTP
 
 - **URL**: `/resend-otp`
@@ -145,8 +153,12 @@ json { "error": false, "message": "OTP verified successfully" }
 }
 ```
 - **Response**:
-json { "error": false, "message": "OTP baru telah dikirim ke email Anda." }
-
+json
+```
+{
+"message": "OTP baru telah dikirim ke email Anda."
+}
+```
 ### 4. User Login
 
 - **URL**: `/auth/login`
@@ -162,14 +174,23 @@ json { "error": false, "message": "OTP baru telah dikirim ke email Anda." }
 }
 ```
 - **Response**:
-json { "error": false, "message": "Login berhasil", "token": "your_jwt_token" }
+json
+```
+{ 
+"message": "Login berhasil",
+"token": "your_jwt_token"
+}
+```
 
 ### 5. Get User by ID
 
 - **URL**: `/:user_id`
 - **Method**: `GET`
 - **Response**:
-json { "transactions": [ { "user_id": "user_id_value", "name": "user_name", "email": "user@example.com" } ] }
+json
+```
+{ "transactions": [ { "user_id": "user_id_value", "name": "user_name", "email": "user@example.com" } ] }
+```
 
 ### 6. Logout
 
@@ -178,8 +199,12 @@ json { "transactions": [ { "user_id": "user_id_value", "name": "user_name", "ema
 - **Authorization**:
   - `Bearer Token {{token}}`
 - **Response**:
-json { "message": "Logout successful" }
-
+json
+```
+{
+"message": "Logout successful"
+}
+```
 
 ### 7. Get User Profile
 
@@ -188,7 +213,15 @@ json { "message": "Logout successful" }
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
 - **Response**:
-json { "user_id": "user_id_value", "fullname": "user_name", "date_of_birth": "YYYY-MM-DD", "phone_number": "1234567890" }
+json
+```
+{
+"user_id": "user_id_value",
+"fullname": "user_name",
+"date_of_birth": "YYYY-MM-DD",
+"phone_number": "1234567890" 
+}
+```
 
 ### 8. Update User Profile
 
@@ -205,7 +238,13 @@ json { "user_id": "user_id_value", "fullname": "user_name", "date_of_birth": "YY
 }
 ```
 - **Response**:
-json { "fullname": "user_name", "date_of_birth": "YYYY-MM-DD", "phone_number": "1234567890" }
+json
+```
+{ "fullname": "user_name",
+"date_of_birth": "YYYY-MM-DD",
+"phone_number": "1234567890"
+}
+```
 
 ### 9. Post Voice Input
 
@@ -221,8 +260,13 @@ json { "fullname": "user_name", "date_of_birth": "YYYY-MM-DD", "phone_number": "
 }
 ```
 - **Response**:
-json { "error": false, "message": "Income recorded successfully", "income_id": "income_id_value" }
-
+json
+```
+{
+"message": "Income recorded successfully",
+"income_id": "income_id_value"
+}
+```
 
 ### 10. Post Receipt
 
@@ -233,7 +277,20 @@ json { "error": false, "message": "Income recorded successfully", "income_id": "
 - **Request Body**: (form-data)
   - `receipt`: (file)
 - **Response**:
-json { "message": "Receipt scanned and expense recorded successfully", "expense_id": "expense_id_value", "extracted_text": "extracted_text_value", "parsed_receipt": { "company": "Company Name", "total": "Total Amount", "items": ["Item 1", "Item 2"] } }
+json
+```
+{ 
+"message": "Receipt scanned and expense recorded successfully", 
+"expense_id": "expense_id_value", 
+"extracted_text": "extracted_text_value", 
+"parsed_receipt": 
+{ "company": 
+"Company Name", 
+"total": 
+"Total Amount", 
+"items": ["Item 1", "Item 2"] } 
+}
+```
 
 ### 11. Post Budget
 
@@ -249,7 +306,13 @@ json { "message": "Receipt scanned and expense recorded successfully", "expense_
 }
 ```
 - **Response**:
-json { "message": "Budget created successfully", "budget_id": "budget_id_value" }
+json
+```
+{
+"message": "Budget created successfully",
+"budget_id": "budget_id_value"
+}
+```
 
 ### 12. Get Budget
 
@@ -258,7 +321,15 @@ json { "message": "Budget created successfully", "budget_id": "budget_id_value" 
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
 - **Response**:
-json [ { "budget_id": "budget_id_value", "user_id": "user_id_value", "income_month": "1000000", "budget_month": "800000" } ]
+json
+```
+{
+"budget_id": "budget_id_value",
+"user_id": "user_id_value",
+"income_month": "1000000",
+"budget_month": "800000"
+} 
+```
 
 ### 13. Update Budget
 
@@ -274,7 +345,12 @@ json [ { "budget_id": "budget_id_value", "user_id": "user_id_value", "income_mon
 }
 ```
 - **Response**:
-json { "message": "Budget updated successfully" }
+json
+```
+{ 
+"message": "Budget updated successfully" 
+}
+```
 
 ### 14. Delete Budget
 
@@ -283,7 +359,12 @@ json { "message": "Budget updated successfully" }
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
 - **Response**:
-json { "message": "Budget deleted successfully" }
+json
+```
+{
+"message": "Budget deleted successfully"
+}
+```
 
 ### 15. Post Expense
 
@@ -302,7 +383,13 @@ json { "message": "Budget deleted successfully" }
 }
 ```
 - **Response**:
-json { "message": "Expense created successfully", "expense_id": "expense_id_value" }
+json
+```
+{
+"message": "Expense created successfully",
+"expense_id": "expense_id_value"
+}
+```
 
 
 ### 16. Get Expense
@@ -312,8 +399,17 @@ json { "message": "Expense created successfully", "expense_id": "expense_id_valu
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
 - **Response**:
-json [ { "Expense_ID": "expense_id_value", "User_ID": "user_id_value", "Expense_amount": 50000, "Expense_date": "2024-12-01", "store": "Store Name", "items": ["Item 1", "Item 2"] } ]
-
+json
+```
+{ 
+"Expense_ID": "expense_id_value", 
+"User_ID": "user_id_value", 
+"Expense_amount": 50000, 
+"Expense_date": "2024-12-01", 
+"store": "Store Name", 
+"items": ["Item 1", "Item 2"] 
+} 
+```
 
 ### 17. Update Expense
 
@@ -332,7 +428,12 @@ json [ { "Expense_ID": "expense_id_value", "User_ID": "user_id_value", "Expense_
 }
 ```
 - **Response**:
-json { "message": "Expense updated successfully" }
+json
+```
+{
+"message": "Expense updated successfully"
+}
+```
 
 ### 18. Delete Expense
 
@@ -341,7 +442,12 @@ json { "message": "Expense updated successfully" }
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
 - **Response**:
-json { "message": "Expense deleted successfully" }
+json
+```
+{
+"message": "Expense deleted successfully"
+}
+```
 
 ### 19. Get Category
 
@@ -350,7 +456,14 @@ json { "message": "Expense deleted successfully" }
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
 - **Response**:
-json [ { "category_id": "category_id_value", "name": "Food", "transaction_type": "expense" } ]
+json
+```
+{
+"category_id": "category_id_value",
+"name": "Food",
+"transaction_type": "expense"
+}
+```
 
 ### 20. Post Category
 
@@ -366,7 +479,13 @@ json [ { "category_id": "category_id_value", "name": "Food", "transaction_type":
 }
 ```
 - **Response**:
-json { "message": "Category created successfully", "category_id": "category_id_value" }
+json
+```
+{
+"message": "Category created successfully",
+"category_id": "category_id_value"
+}
+```
 
 ### 21. Update Category
 
@@ -381,7 +500,12 @@ json { "message": "Category created successfully", "category_id": "category_id_v
 }
 ```
 - **Response**:
-json { "message": "Category updated successfully" }
+json
+```
+{
+"message": "Category updated successfully"
+}
+```
 
 ### 22. Delete Category
 
@@ -390,7 +514,12 @@ json { "message": "Category updated successfully" }
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
 - **Response**:
-json { "message": "Category deleted successfully" }
+json
+```
+{
+"message": "Category deleted successfully"
+}
+```
 
 ### 23. Post Income
 
@@ -408,7 +537,13 @@ json { "message": "Category deleted successfully" }
 }
 ```
 - **Response**:
-json { "message": "Income created successfully", "income_id": "income_id_value" }
+json
+```
+{
+"message": "Income created successfully",
+"income_id": "income_id_value"
+}
+```
 
 ### 24. Get Income
 
@@ -417,7 +552,16 @@ json { "message": "Income created successfully", "income_id": "income_id_value" 
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
 - **Response**:
-json [ { "income_id": "income_id_value", "user_id": "user_id_value", "income_amount": 1000000, "income_date": "2024-12-01", "description": "Salary" } ]
+json
+```
+{
+"income_id": "income_id_value",
+"user_id": "user_id_value",
+"income_amount": 1000000,
+"income_date": "2024-12-01",
+"description": "Salary"
+} 
+```
 
 ### 25. Update Income
 
@@ -434,7 +578,12 @@ json [ { "income_id": "income_id_value", "user_id": "user_id_value", "income_amo
 }
 ```
 - **Response**:
-json { "message": "Income updated successfully" }
+json
+```
+{
+"message": "Income updated successfully"
+}
+```
 
 ### 26. Delete Income
 
@@ -443,7 +592,12 @@ json { "message": "Income updated successfully" }
 - **Headers**:
   - `Authorization`: `Bearer {{token}}`
 - **Response**:
-json { "message": "Income deleted successfully" }
+json
+```
+{
+"message": "Income deleted successfully"
+}
+```
 
 ### 27. Get Report Analysis
 
@@ -454,7 +608,17 @@ json { "message": "Income deleted successfully" }
 - **Query Parameters**:
   - `period`: `daily`, `weekly`, or `monthly`
 - **Response**:
-json { "totalIncome": 1000000, "totalExpense": 50000, "netBalance": 950000, "incomePercentage": "95.00", "expensePercentage": "5.00", "categories": [ { "name": "Food", "total_expense": 50000 } ] }
+json
+```
+{
+"totalIncome": 1000000,
+"totalExpense": 50000,
+"netBalance": 950000,
+"incomePercentage": "95.00",
+"expensePercentage": "5.00",
+"categories": [ { "name": "Food", "total_expense": 50000 } ]
+}
+```
 
 ### 28. Post Financial Goals
 
@@ -471,14 +635,31 @@ json { "totalIncome": 1000000, "totalExpense": 50000, "netBalance": 950000, "inc
 }
 ```
 - **Response**:
-json { "message": "Saving goals created successfully", "goal_id": "goal_id_value" }
+json
+```
+{
+"message": "Saving goals created successfully",
+"goal_id": "goal_id_value"
+}
+```
 
 ### 29. Get Financial Goals
 
 - **URL**: `/financial-goals/:user_id/:goal_id`
 - **Method**: `GET`
 - **Response**:
-json { "goal_id": "goal_id_value", "user_id": "user_id_value", "goal_name": "Save for Vacation", "target_amount": 2000000, "current_amount": 500000, "start_date": "2024-01-01", "goal_deadline": "2024-12-31" }
+json
+```
+{
+"goal_id": "goal_id_value",
+"user_id": "user_id_value",
+"goal_name": "Save for Vacation",
+"target_amount": 2000000,
+"current_amount": 500000,
+"start_date": "2024-01-01",
+"goal_deadline": "2024-12-31"
+}
+```
 
 ### 30. Update Financial Goals
 
@@ -494,21 +675,36 @@ json { "goal_id": "goal_id_value", "user_id": "user_id_value", "goal_name": "Sav
 }
 ```
 - **Response**:
-json { "message": "Goal updated successfully" }
+json
+```
+{
+"message": "Goal updated successfully"
+}
+```
 
 ### 31. Delete Financial Goals
 
 - **URL**: `/financial-goals/:user_id/:goal_id`
 - **Method**: `DELETE`
 - **Response**:
-json { "message": "Goal deleted successfully" }
+json
+```
+{
+"message": "Goal deleted successfully"
+}
+```
 
 ### 31. Delete Financial Goals
 
 - **URL**: `/financial-goals/:user_id/:goal_id`
 - **Method**: `DELETE`
 - **Response**:
-json { "message": "Goal deleted successfully" }
+json
+```
+{
+"message": "Goal deleted successfully"
+}
+```
 
 ### 32. Investment Calculator Input
 
