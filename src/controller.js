@@ -80,7 +80,7 @@ const verifyOTP = async (req, res) => {
 
   if (results.length > 0) {
     await db.query("UPDATE users SET verified = 1 WHERE email = ?", [email]);
-    await db.query("DELETE FROM otp_verification WHERE user_id = (SELECT user_id FROM users WHERE email = ?)", [email]); // Remove OTP after verification
+    await db.query("DELETE FROM otp_verification WHERE user_id = (SELECT user_id FROM users WHERE email = ?)", [email]); 
     res.status(200).json({ message: "OTP verified successfully" });
   } else {
     res.status(400).json({ message: "Invalid OTP" });
@@ -388,13 +388,6 @@ const postExpense = async (req, res) => {
     const db = await connectDB();
     const expense_id = uuidv4();
 
-    // Validasi category_id
-    const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
-    if (categoryCheck.length === 0 || categoryCheck[0].transaction_type !== 'expense') {
-      return res.status(400).json({ message: 'Invalid category for expense' });
-    }
-
-    // Query untuk menyimpan pengeluaran
     const query = 'INSERT INTO expense (Expense_ID, User_ID, category_id, Expense_amount, Expense_date, store, items) VALUES (?, ?, ?, ?, ?, ?, ?)';
     const values = [expense_id, user_id, category_id, expense_amount, expense_date, store, JSON.stringify(items)];
 
@@ -427,11 +420,6 @@ const putExpense = async (req, res) => {
     const { expense_amount, expense_date, store, items } = req.body; 
     const category_id = req.headers['category_id'];
     const db = await connectDB();
-
-    const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
-    if (categoryCheck.length === 0 || categoryCheck[0].transaction_type !== 'expense') {
-      return res.status(400).json({ message: 'Invalid category for expense' });
-    }
 
     const query = 'UPDATE expense SET Expense_amount = ?, Expense_date = ?, store = ?, items = ?, category_id = ? WHERE Expense_ID = ?';
     const values = [expense_amount, expense_date, store, JSON.stringify(items), category_id, expense_id];
@@ -542,12 +530,6 @@ const postIncome = async (req, res) => {
     const category_id = req.headers['category_id']; 
     const db = await connectDB();
     const income_id = uuidv4();
-
-    const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
-    if (categoryCheck.length === 0 || categoryCheck[0].transaction_type !== 'income') {
-      return res.status(400).json({ message: 'Invalid category for income' });
-    }
-
     const query = 'INSERT INTO income (income_id, user_id, category_id, income_amount, income_date, description) VALUES (?, ?, ?, ?, ?, ?)';
     const values = [income_id, user_id, category_id, income_amount, income_date, description];
 
@@ -584,11 +566,6 @@ const putIncome = async (req, res) => {
     const { income_amount, income_date, description } = req.body;
     const category_id = req.headers['category_id'];
     const db = await connectDB();
-
-    const [categoryCheck] = await db.query('SELECT transaction_type FROM category WHERE category_id = ?', [category_id]);
-    if (categoryCheck.length === 0 || categoryCheck[0].transaction_type !== 'income') {
-      return res.status(400).json({ message: 'Invalid category for income' });
-    }
 
     const query = 'UPDATE income SET category_id = ?, income_amount = ?, income_date = ?, description = ? WHERE income_id = ?';
     const values = [category_id, income_amount, income_date, description, income_id];
