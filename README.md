@@ -44,6 +44,8 @@ ANGGAR.IN CLOUD COMPUTING DOCUMENTATION
 * Create API for investment calculator - Muhammad Alvanditya Sasongko (C214B4KY2719)
 * Create API for Investment recomendation - Muhammad Alvanditya Sasongko (C214B4KY2719)
 * Create API for Investment prediction - Muhammad Alvanditya Sasongko (C214B4KY2719)
+* Create API for Financial goals - Muhammad Alvanditya Sasongko (C214B4KY2719)
+* Create database with cmpute engine - Muhammad Alvanditya Sasongko (C214B4KY2719)
 
 
 # Anggar.In Cloud Computing Project Explanation
